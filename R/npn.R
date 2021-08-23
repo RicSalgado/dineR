@@ -1,14 +1,19 @@
-#' Title
+#' NPN - Non paranormal Transformation
 #'
-#' @param x
-#' @param npn_func
-#' @param npn_thresh
-#' @param verbose
+#' This functions allows us to transform non-normal multivariate data to that of
+#' non paranormal data.
 #'
-#' @return
+#' @param x The multivariate non-normal data to be transformed.
+#' @param npn_func Optional parameter - The method of transformation to be applied. Can either be "shrinkage" or "truncation" but defaults to "shrinkage".
+#' @param npn_thresh Optional parameter - The truncation threshold that is used when making use of truncation.
+#' @param verbose Optional parameter - Prints additional output of the selected approach. Can either be "TRUE" or "FALSE" and defaults to "TRUE".
+#'
+#' @return Returns the transformed data matrix.
 #' @export
 #'
-#' @examples
+#' @examples npn(x, npn_func = "truncation", npn_thresh = 0.5)
+#' @examples npn(x, verbose = FALSE)
+#'
 npn <- function(x, npn_func = "shrinkage", npn_thresh = NULL, verbose = TRUE){
 
   n <- nrow(x)

@@ -4,32 +4,21 @@
 # necessary dimensions are maintained.
 
 #' Data Generator
-
-#' This functions generates two n $\times$ p size samples of multivariate normal
+#'
+#' This functions generates two \eqn{n} by \eqn{p} size samples of multivariate normal
 #' data. In doing this it also determines and provides the relevant covariance
 #' matrices.
 #'
 #' @param n The number of observations generated.
 #' @param p The number of dimensions for the generated samples.
-#' @param Delta Optional parameter that provides the differential network that will be used to obtain the sample covariance matrices.
-#' @param case Optional parameter to select under which case the covariance matrices are determined. Possible cases are: "sparse" - Sparse Case or "asymsparse"- Asymptotically Sparse Case. Defaults to "sparse".
-#' @param seed Optional parameter to set the seed allowing for reproducibility.
+#' @param Delta Optional parameter - Provides the differential network that will be used to obtain the sample covariance matrices.
+#' @param case Optional parameter - Selects under which case the covariance matrices are determined. Possible cases are: "sparse" - Sparse Case or "asymsparse"- Asymptotically Sparse Case. Defaults to "sparse".
+#' @param seed Optional parameter - Allows a seed to be set for reproducibility.
 #' @return A list with the case used (**case**), seed selected (**seed_option**), two multivariate normal samples (**X** and **Y**), their covariance matrices (**Sigma_X** and **Sigma_Y**), their precision matrices (**Omega_X** and **Omega_Y**), the difference of precision matrices (**diff_Omega**) and the target differential network (**Delta**).
 #' @export
 #'
 #' @examples data_generator(n = 100, p = 50, seed = 123)
 #' @examples data_generator(n = 10, p = 50, case = "asymsparse")
-
-results$case <- case
-results$seed <- seed_option
-results$X <- X
-results$Y <- Y
-results$Sigma_X <- Sigma_X
-results$Sigma_Y <- Sigma_Y
-results$Omega_X <- Omega_X
-results$Omega_Y <- Omega_Y
-results$diff_Omega <- diff_Omega
-results$Delta <- Delta
 
 data_generator = function(n, p, Delta = NULL, case = "sparse", seed = NULL){
 
