@@ -203,91 +203,91 @@ diffnet_scad = function(pSigma_X, pSigma_Y, p,
 ##############################################################################
 
 loss_func <- function(Sigma_X, Sigma_Y, diff_Sigma, Delta){
-  
+
   lf <- 0.25*sum(sum(Delta * (Sigma_X%*%Delta%*%Sigma_Y))) + 0.25*sum(sum(Delta * (Sigma_Y%*%Delta%*%Sigma_X))) - sum(sum(Delta * diff_Sigma))
   return(lf)
-  
+
 }
 
 symmetric_admm <- function(pDelta0, pDelta3, pLambda0, pLambda3,
                            pSigmaX, pSigmaY, rho,
                            pC1, pC2, pUx, pUy, tol, p, lambda, max_iter){
-  
+
   SigmaX <- as.matrix(pSigmaX, p, p)
-  
+
   SigmaY <- as.matrix(pSigmaY, p, p)
-  
+
   diff_Sigma <- SigmaX - SigmaY
-  
+
   C1 <- as.matrix(pC1, p, p)
   C2 <- as.matrix(pC2, p, p)
-  
+
   Ux <- as.matrix(pUx, p, p)
   Uy <- as.matrix(pUy, p, p)
-  
+
   A <- matrix(NA, p, p)
   B <- matrix(NA, p, p)
   C <- matrix(NA, p ,p)
-  
+
   Delta1 <- as.matrix(pDelta0, p, p)
   Delta2 <- as.matrix(pDelta0, p, p)
   Delta3 <- as.matrix(pDelta3, p, p)
-  
+
   temp <- matrix(NA, p, p)
-  
+
   Lambda1 <- as.matrix(pLambda0, p, p)
-  
+
   Lambda2 <- as.matrix(pLambda0, p, p)
-  
+
   Lambda3 <- as.matrix(pLambda3, p, p)
-  
+
   iter <- 0
   f_old <- 0
   err <- 0
-  
+
   f <- loss_func(SigmaX, SigmaY, diff_Sigma, Delta3) + penalty_func(Delta3, lambda)
-  
+
   while(iter < max_iter){
-    
+
     A <- SigmaX - SigmaY + rho*Delta2 + rho*Delta3 + Lambda3 - Lambda1
-    
+
     Delta1 <- Uy %*% (C1 * (t(Uy)%*%A%*%Ux)) %*% t(Ux)
-    
+
     B <- SigmaX - SigmaY + rho*Delta1 + rho*Delta3 + Lambda1 - Lambda2
-    
+
     Delta2 <- Ux %*% (C2 *(t(Ux)%*%B%*%Uy)) %*% t(Uy)
-    
+
     C <- (Lambda2/rho - Lambda3/rho + Delta1 + Delta2) / 2
-    
+
     Delta3 <- soft(C, (lambda/rho) / 2)
-    
+
     temp <- Delta3
-    
+
     Delta3 <- (temp + t(temp))/2
-    
+
     f_old <- f
     f <- loss_func(SigmaX, SigmaY, diff_Sigma, Delta3) + penalty_func(Delta3, lambda)
-    
+
     err <- (f_old - f) / (f_old + 1)
     err <- abs(err)
-    
+
     Lambda1 <- Lambda1 + rho * (Delta1 - Delta2)
     Lambda2 <- Lambda2 + rho * (Delta2 - Delta3)
     Lambda3 <- Lambda3 + rho * (Delta3 - Delta1)
-    
+
     iter <- iter + 1
-    
+
     if ((err < tol & iter != 0) || iter == max_iter){
-      
+
       output <- list()
       output$Delta3 <- Delta3
       output$Lambda3 <- Lambda3
       output$iter <- iter
-      
+
       return(output)
-      
+
     }
-    
+
   }
-  
+
 }
