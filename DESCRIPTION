@@ -1,0 +1,15 @@
+Package: diner
+Title: Differential Network Estimation in R
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Ricardo Daniel",
+           family = "Marques Salgado",
+           role = c("aut", "cre"),
+           email = "ricardodansalgado@gmail.com",
+           comment = c(ORCID = "0000-0002-6415-7379"))
+Description: An efficient and convenient set of functions to perform differential network estimation through the use of alternating direction method of multipliers optimization with a variety of loss functions. 
+License: `use_mit_license()`
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
