@@ -49,7 +49,7 @@
 #' @examples data <- data_generator(n = 100, p = 50, seed = 123)
 #' @examples X <- data$X
 #' @examples Y <- data$Y
-#' @examples estimation(X,Y)
+#' @examples result <- estimation(X,Y)
 
 #' @import progress
 

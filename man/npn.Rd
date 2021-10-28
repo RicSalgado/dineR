@@ -25,5 +25,5 @@ non paranormal data.
 \examples{
 data <- data_generator(n = 100, p = 50, seed = 123)
 X <- data$X
-npn(X, npn_func = "truncation")
+X_transformed <- npn(X, npn_func = "truncation")
 }

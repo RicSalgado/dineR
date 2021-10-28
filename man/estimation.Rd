@@ -48,11 +48,11 @@ estimation(
 
 \item{correlation}{Optional parameter - Determines whether the sample correlation matrices should be used in the place of the sample covariance matrices. Choices are TRUE and FALSE with the function defaulting to FALSE.}
 
-\item{lipschitz}{Optional parameter - Whether the lipshitz constant is printed or not. Choices are TRUE or FALSE, with the default being FALSE.}
+\item{lipschitz}{Optional parameter - Whether the lipschitz constant is printed or not. Choices are TRUE or FALSE, with the default being FALSE.}
 
 \item{Delta_init}{Optional parameter - Allows for the algorithm to provided an initial estimate of the differential network to ease computation.}
 
-\item{rho}{Optional parameter - Allows for further customization of the "d-trace" loss function.}
+\item{rho}{Optional parameter - Allows the user to adjust the ADMM step-size. Defaults to 1.}
 
 \item{gamma}{Optional parameter - Allows the user to adjust the EBIC value when EBIC is the selected tuning method. Defaults to 0.5.}
 }
@@ -89,5 +89,5 @@ two samples of multivariate normal data.
 data <- data_generator(n = 100, p = 50, seed = 123)
 X <- data$X
 Y <- data$Y
-estimation(X,Y)
+result <- estimation(X,Y)
 }

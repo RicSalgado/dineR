@@ -38,6 +38,6 @@ data. In doing this it also determines and provides the relevant covariance
 matrices.
 }
 \examples{
-data_generator(n = 100, p = 50, seed = 123)
-data_generator(n = 10, p = 50, case = "asymsparse")
+data <- data_generator(n = 100, p = 50, seed = 123)
+data <- data_generator(n = 10, p = 50, case = "asymsparse")
 }

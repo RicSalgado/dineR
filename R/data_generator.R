@@ -31,8 +31,8 @@
 #' }
 #' @export
 #'
-#' @examples data_generator(n = 100, p = 50, seed = 123)
-#' @examples data_generator(n = 10, p = 50, case = "asymsparse")
+#' @examples data <- data_generator(n = 100, p = 50, seed = 123)
+#' @examples data <- data_generator(n = 10, p = 50, case = "asymsparse")
 
 #' @import MASS
 #' @importFrom "stats" "cor" "cov" "qnorm" "sd" "toeplitz"
