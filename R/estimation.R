@@ -16,7 +16,7 @@
 #' @param stop_tol Optional parameter - The stop tolerance to determine whether convergence has occurred. Defaults to 1e-5.
 #' @param max_iter Optional parameter - The maximum number of iterations that can be perform for any one regularization value. Defaults to 100.
 #' @param correlation Optional parameter - Determines whether the sample correlation matrices should be used in the place of the sample covariance matrices. Choices are TRUE and FALSE with the function defaulting to FALSE.
-#' @param lipschitz Optional parameter - Whether the lipshitz constant is printed or not. Choices are TRUE or FALSE, with the default being FALSE.
+#' @param lipschitz Optional parameter - Whether the lipschitz constant is printed or not. Choices are TRUE or FALSE, with the default being FALSE.
 #' @param Delta_init Optional parameter - Allows for the algorithm to provided an initial estimate of the differential network to ease computation.
 #' @param rho Optional parameter - Allows the user to adjust the ADMM step-size. Defaults to 1.
 #' @param gamma Optional parameter - Allows the user to adjust the EBIC value when EBIC is the selected tuning method. Defaults to 0.5.
