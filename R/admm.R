@@ -1,4 +1,4 @@
-# This script contains "helper" functions, as well as the actual ADMM optimization
+# This script contains "helper" functions, as well as the ADMM optimization
 
 # This is the soft thresholding function that occurs within ADMM
 

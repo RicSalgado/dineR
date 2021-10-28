@@ -322,8 +322,8 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
       for (k in 1:p){
         for (j in 1:p){
-          C1[k,j] = 1/(Dy[j]*Dx[k]+2*rho)
-          C2[k,j] = 1/(Dy[k]*Dx[j]+2*rho)
+          C1[k,j] <- 1/(Dy[j]*Dx[k]+2*rho)
+          C2[k,j] <- 1/(Dy[k]*Dx[j]+2*rho)
         }
       }
 
