@@ -2,6 +2,6 @@ pandoc: 2.7.3
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
-  Differential Networks: Differential Networks.html
-last_built: 2021-10-28T13:00Z
+  Differential-Networks: Differential-Networks.html
+last_built: 2021-10-28T13:28Z
 
