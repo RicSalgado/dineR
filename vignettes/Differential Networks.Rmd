@@ -1,0 +1,67 @@
+---
+title: "Differential Networks"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Differential Networks}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(dineR)
+```
+
+Differential networks are a powerful tool that have seen a significant amount of recent attention within various scientific communities. This is largely attributed to their ability to effectively represent the relationships between factors of complex systems over time, or over various experimental conditions. However, a differential network is not easily calculated, and in high dimensional settings common within biological sciences they must be estimated. Motivated by this, this vignette acts as a tutorial as to how one can go about generating data and then estimating the subsequent differential network through the use of _dineR_. 
+
+## Data Generation
+
+For the purposes of this tutorial, we will use the functions built in functions to generate two multivariate normal sample datasets:
+
+```{r}
+# Number of observations in sample 1
+n_X <- 100 
+# Number of features in sample 1
+p_X <- 100
+# Number of observations in sample 2
+n_Y <- n_X
+# Number of features in sample 2
+p_Y <- p_X
+# Generate the data
+data <- data_generator(n = n_X, p = p_X, seed = 123)
+```
+
+Now that the data has been generated, the data can be "wrangled" into the estimation function:
+
+```{r}
+X <- data$X
+Y <- data$Y
+```
+
+## Model Building
+
+We now need to specify several of the arguments required for the estimation procedure, such as which loss function we want to minimize, the number of lambdas to consider and whether the model performs any tuning:
+
+```{r}
+loss <- "lasso"
+nlambda <- 50
+tuning <- "none"
+```
+
+There are many more arguments that can be provided to the estimation function, however for the purposes of this tutorial, they will not be shown here but are included within the package's documentation. 
+
+We can now call the function to perform the estimation which makes use of alternating direction method of multipliers to minimize the selected loss function. This is done as follows: 
+
+```{r}
+result <- estimation(X, Y, loss = loss, nlambda = nlambda, tuning = tuning)
+```
+While the estimation process is busy, a progress bar should appear within the R Console showing the status of the optimization along with an estimated time remaining. The estimation then returns a great deal of items, and more if tuning is performed. For an overview on the items returned we can do the following:
+
+```{r}
+names(result)
+```
+
+In the above output, arguably the most important component is the "path" which is the final differential network estimate for each of the lambdas for the chosen loss function. As such, in the above example "path" consists of 50 different estimates, one for each lambda.

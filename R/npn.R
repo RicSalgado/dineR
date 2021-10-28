@@ -11,9 +11,10 @@
 #' @return Returns the transformed data matrix.
 #' @export
 #'
-#' @examples npn(x, npn_func = "truncation", npn_thresh = 0.5)
-#' @examples npn(x, verbose = FALSE)
-#'
+#' @examples data <- data_generator(n = 100, p = 50, seed = 123)
+#' @examples X <- data$X
+#' @examples npn(X, npn_func = "truncation")
+
 npn <- function(x, npn_func = "shrinkage", npn_thresh = NULL, verbose = TRUE){
 
   n <- nrow(x)

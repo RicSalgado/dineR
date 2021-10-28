@@ -105,7 +105,7 @@ diffnet_lasso <- function(pSigma_X, pSigma_Y, p, pLambda, pX, pY, n_X, n_Y, epsi
 
       }else{
 
-        grad_L <- t(X) %*% (X%*%Delta_extra%*%t(Y)) %*% Y  + epsilon_Y %*% t(X) %*% (X%*%Delta_extra) + epsilon_X %*% (Delta_extra%*%trans(Y)) %*% Y + epsilon_X %*% epsilon_Y %*% Delta_extra
+        grad_L <- t(X) %*% (X%*%Delta_extra%*%t(Y)) %*% Y  + epsilon_Y %*% t(X) %*% (X%*%Delta_extra) + epsilon_X %*% (Delta_extra%*%t(Y)) %*% Y + epsilon_X %*% epsilon_Y %*% Delta_extra
         grad_L <- ( grad_L + t(grad_L) ) / 2 - diff_Sigma
 
       }
@@ -181,7 +181,7 @@ compute_scad_lambda <- function(Delta, lambda, a){
  return(weighted_lambda)
 }
 
-diffnet_scad = function(pSigma_X, pSigma_Y, p,
+diffnet_scad <- function(pSigma_X, pSigma_Y, p,
                         lambda, a, pX, pY, n_X, n_Y,
                         epsilon_X, epsilon_Y,
                         lip, stop_tol, max_iter, pDelta){

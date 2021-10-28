@@ -14,13 +14,30 @@
 #' @param Delta Optional parameter - Provides the differential network that will be used to obtain the sample covariance matrices.
 #' @param case Optional parameter - Selects under which case the covariance matrices are determined. Possible cases are: "sparse" - Sparse Case or "asymsparse"- Asymptotically Sparse Case. Defaults to "sparse".
 #' @param seed Optional parameter - Allows a seed to be set for reproducibility.
-#' @return A list with the case used (**case**), seed selected (**seed_option**), two multivariate normal samples (**X** and **Y**), their covariance matrices (**Sigma_X** and **Sigma_Y**), their precision matrices (**Omega_X** and **Omega_Y**), the difference of precision matrices (**diff_Omega**) and the target differential network (**Delta**).
+#'
+#'
+#' @return A list of various outputs, namely:
+#' \itemize{
+#' \item case - The case used.
+#' \item seed_option - The seed provided.
+#' \item X - The first multivariate normal sample.
+#' \item Y - The second multivariate normal sample.
+#' \item Sigma_X - The covariance matrix of X.
+#' \item Sigma_Y - The covariance matrix of Y.
+#' \item Omega_X - The precision matrix of X.
+#' \item Omega_Y - The precision matrix of Y.
+#' \item diff_Omega - The difference of precision matrices.
+#' \item Delta - The target differential network.
+#' }
 #' @export
 #'
 #' @examples data_generator(n = 100, p = 50, seed = 123)
 #' @examples data_generator(n = 10, p = 50, case = "asymsparse")
 
-data_generator = function(n, p, Delta = NULL, case = "sparse", seed = NULL){
+#' @import MASS
+#' @importFrom "stats" "cor" "cov" "qnorm" "sd" "toeplitz"
+
+data_generator <- function(n, p, Delta = NULL, case = "sparse", seed = NULL){
 
   if(n < 1){
     cat("The number of observations is too few.")

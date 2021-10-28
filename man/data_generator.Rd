@@ -18,7 +18,19 @@ data_generator(n, p, Delta = NULL, case = "sparse", seed = NULL)
 \item{seed}{Optional parameter - Allows a seed to be set for reproducibility.}
 }
 \value{
-A list with the case used (\strong{case}), seed selected (\strong{seed_option}), two multivariate normal samples (\strong{X} and \strong{Y}), their covariance matrices (\strong{Sigma_X} and \strong{Sigma_Y}), their precision matrices (\strong{Omega_X} and \strong{Omega_Y}), the difference of precision matrices (\strong{diff_Omega}) and the target differential network (\strong{Delta}).
+A list of various outputs, namely:
+\itemize{
+\item case - The case used.
+\item seed_option - The seed provided.
+\item X - The first multivariate normal sample.
+\item Y - The second multivariate normal sample.
+\item Sigma_X - The covariance matrix of X.
+\item Sigma_Y - The covariance matrix of Y.
+\item Omega_X - The precision matrix of X.
+\item Omega_Y - The precision matrix of Y.
+\item diff_Omega - The difference of precision matrices.
+\item Delta - The target differential network.
+}
 }
 \description{
 This functions generates two \eqn{n} by \eqn{p} size samples of multivariate normal

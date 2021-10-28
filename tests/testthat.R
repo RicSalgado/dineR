@@ -1,4 +1,4 @@
 library(testthat)
-library(diner)
+library(dineR)
 
-test_check("diner")
+test_check("dineR")
