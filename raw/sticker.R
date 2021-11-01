@@ -1,6 +1,6 @@
 library(hexSticker)
 
-hexSticker::sticker("inst/sticker/network.png",
+hexSticker::sticker("sticker/network.png",
                     u_size = 5,
                     package = "dineR",
                     s_x = 1.0,
@@ -14,4 +14,4 @@ hexSticker::sticker("inst/sticker/network.png",
                     h_fill = "black",
                     p_color = "white",
                     p_size = 17,
-                    filename="inst/sticker/dineR.png")
+                    filename="sticker/dineR.png")

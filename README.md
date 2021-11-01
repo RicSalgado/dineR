@@ -1,7 +1,7 @@
 
 # dineR
 
-<img src="https://github.com/RicSalgado/dineR/raw/inst/sticker/dineR.png" width="150" height="150" align="right"/>
+<img src="https://raw.githubusercontent.com/RicSalgado/dineR/master/raw/sticker/dineR.png" width="150" height="150" align="right"/>
 
 <!-- badges: start -->
 
