@@ -1,6 +1,8 @@
 
 # dineR
 
+<img src="https://github.com/RicSalgado/dineR/raw/inst/sticker/dineR.png" width="150" height="150" align="right"/>
+
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/RicSalgado/diner/workflows/R-CMD-check/badge.svg)](https://github.com/RicSalgado/diner/actions)
