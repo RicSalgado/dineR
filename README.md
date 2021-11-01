@@ -2,8 +2,7 @@
 # dineR
 
 <!-- badges: start -->
-[![Travis build status](https://travis-ci.com/RicSalgado/diner.svg?branch=master)](https://travis-ci.com/RicSalgado/diner)
-[![R-CMD-check](https://github.com/RicSalgado/diner/workflows/R-CMD-check/badge.svg)](https://github.com/RicSalgado/diner/actions)
+
 <!-- badges: end -->
 
 The goal of dineR is to enable users of all backgrounds to easily and computationally efficiently perform differential network estimation. 

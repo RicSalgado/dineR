@@ -16,7 +16,6 @@ Authors@R:
 Description: An efficient and convenient set of functions to perform differential network estimation through the use of alternating direction method of multipliers optimization with a variety of loss functions. 
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 URL: https://github.com/RicSalgado/dineR
