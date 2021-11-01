@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">dineR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0.0000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -116,7 +116,7 @@
 <p>We now need to specify several of the arguments required for the estimation procedure, such as which loss function we want to minimize, the number of lambdas to consider and whether the model performs any tuning:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">loss</span> <span class="op">&lt;-</span> <span class="st">"lasso"</span>
-<span class="va">nlambda</span> <span class="op">&lt;-</span> <span class="fl">50</span>
+<span class="va">nlambda</span> <span class="op">&lt;-</span> <span class="fl">3</span>
 <span class="va">tuning</span> <span class="op">&lt;-</span> <span class="st">"none"</span></code></pre></div>
 <p>There are many more arguments that can be provided to the estimation function, however for the purposes of this tutorial, they will not be shown here but are included within the package’s documentation.</p>
 <p>We can now call the function to perform the estimation which makes use of alternating direction method of multipliers to minimize the selected loss function. This is done as follows:</p>
@@ -125,7 +125,7 @@
 <span class="co">#&gt; --------------------------------------------------------------------------------</span>
 <span class="co">#&gt; ----------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
 <span class="co">#&gt; Model: Estimation was perform via Graphical LASSO.</span>
-<span class="co">#&gt; Number of lambdas: 50 </span>
+<span class="co">#&gt; Number of lambdas: 3 </span>
 <span class="co">#&gt; Graph dimension: 100 </span>
 <span class="co">#&gt; Range of lambda values considered: 0.2185187 -----&gt; 0.7283955 </span>
 <span class="co">#&gt; Levels of sparsity of Delta encountered: 0 -----&gt; 0.09242424 </span>
