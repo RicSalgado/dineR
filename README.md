@@ -5,6 +5,7 @@
 
 [![R-CMD-check](https://github.com/RicSalgado/diner/workflows/R-CMD-check/badge.svg)](https://github.com/RicSalgado/diner/actions)
 [![CodeFactor](https://www.codefactor.io/repository/github/ricsalgado/diner/badge)](https://www.codefactor.io/repository/github/ricsalgado/diner)
+[![](https://coveralls.io/repos/github/google/benchmark/badge.svg?branch=master)](https://coveralls.io/github/google/benchmark)
 <!-- badges: end -->
 
 The goal of dineR is to enable users of all backgrounds to easily and computationally efficiently perform differential network estimation. 
