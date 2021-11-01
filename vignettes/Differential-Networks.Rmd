@@ -47,7 +47,7 @@ We now need to specify several of the arguments required for the estimation proc
 
 ```{r}
 loss <- "lasso"
-nlambda <- 50
+nlambda <- 3
 tuning <- "none"
 ```
 

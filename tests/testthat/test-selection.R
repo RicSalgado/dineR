@@ -18,7 +18,7 @@ test_that("selection behaves as expected", {
   diff_Omega <- data$diff_Omega
 
   loss <- "lasso"
-  nlambda <- 50
+  nlambda <- 3
   tuning <- "AIC"
   stop_tol <- 1e-4
   lipschitz <- T
@@ -31,7 +31,7 @@ test_that("selection behaves as expected", {
                        lipschitz = lipschitz, perturb = perturb, correlation = correlation,
                        max_iter = max_iter, lambda_min_ratio = lambda_min_ratio)
 
-  expect_equal(result$chosen_lambda_ic, 0.533594, tolerance = 0.0001)
-  expect_equal(result$ic_value, 120.8688, tolerance = 0.0001)
+  expect_equal(result$chosen_lambda_ic, 0.5150534, tolerance = 0.0001)
+  expect_equal(result$ic_value, 126.6381, tolerance = 0.0001)
 
 })

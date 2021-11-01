@@ -18,7 +18,7 @@ test_that("estimation behaves as expected", {
   diff_Omega <- data$diff_Omega
 
   loss <- "lasso"
-  nlambda <- 50
+  nlambda <- 3
   tuning <- "none"
   stop_tol <- 1e-4
   lipschitz <- T
@@ -31,7 +31,7 @@ test_that("estimation behaves as expected", {
                        lipschitz = lipschitz, perturb = perturb, correlation = correlation,
                        max_iter = max_iter, lambda_min_ratio = lambda_min_ratio)
 
-  expect_equal(result$lip, 30.508, tolerance = 0.0001)
+  expect_equal(result$lip, 30.50836, tolerance = 0.0001)
   expect_equal(max(result$lambdas), 0.7283955, tolerance = 0.0001)
   expect_equal(min(result$lambdas), 0.3641978, tolerance = 0.0001)
 
