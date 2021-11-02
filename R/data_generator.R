@@ -40,24 +40,24 @@
 data_generator <- function(n, p, Delta = NULL, case = "sparse", seed = NULL){
 
   if(n < 1){
-    cat("The number of observations is too few.")
+    warning("The number of observations is too few.")
     return(NULL)
   }
 
   if(p < 2){
-    cat("The number of dimensions is too few.")
+    warning("The number of dimensions is too few.")
     return(NULL)
   }
 
   cases <- c("sparse", "asymsparse")
 
   if(!is.element(case, cases)){
-    cat("Please specify an appropriate case.")
+    warning("Please specify an appropriate case.")
     return(NULL)
   }
 
   if(length(seed) > 1){
-    cat("Please provide an appropriate seed.")
+    warning("Please provide an appropriate seed.")
     return(NULL)
   }
 
@@ -69,12 +69,12 @@ data_generator <- function(n, p, Delta = NULL, case = "sparse", seed = NULL){
   }
 
   if(nrow(Delta) != ncol(Delta)){
-    cat("The provided differential network is not square.")
+    warning("The provided differential network is not square.")
     return(NULL)
   }
 
   if(!isSymmetric(Delta)){
-    cat("The provided differential network is not symmetric.")
+    warning("The provided differential network is not symmetric.")
     return(NULL)
   }
 

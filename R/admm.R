@@ -24,7 +24,7 @@ small_p_loss_func <- function(Sigma_X, Sigma_Y, diff_Sigma, Delta){
 big_p_loss_func <- function(X, Y, diff_Sigma, Delta){
 
   if(!isSymmetric(Delta)){
-    cat("The Delta matrix provided is not symmetric.")
+    warning("The Delta matrix provided is not symmetric.")
     return(NULL)
   }
 

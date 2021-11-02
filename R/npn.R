@@ -26,18 +26,12 @@ npn <- function(x, npn_func = "shrinkage", npn_thresh = NULL, verbose = TRUE){
 	if(npn_func == "shrinkage"){
 		if(verbose){
 
-		  cat("Conducting the nonparanormal (npn) transformation via shrunkun ECDF...\n")
+		  message("Nonparanormal transformation via shrunken ECDF...\n")
 
 		}
 
 		x <- qnorm(apply(x, 2, rank) / (n + 1))
 		x <- x / sd(x[, 1])
-
-		if(verbose){
-
-		  cat("done.\n")
-
-		}
 
 		rm(n, d, verbose)
    	colnames(x) <- x_col
@@ -48,7 +42,7 @@ npn <- function(x, npn_func = "shrinkage", npn_thresh = NULL, verbose = TRUE){
 	if(npn_func == "truncation"){
 		if(verbose){
 
-		  cat("Nonparanomral transformation conducted via truncated ECDF...\n")
+		  message("Nonparanomral transformation via truncated ECDF...\n")
 
 		}
 	  if(is.null(npn_thresh)){
@@ -59,10 +53,6 @@ npn <- function(x, npn_func = "shrinkage", npn_thresh = NULL, verbose = TRUE){
 	  x <- qnorm(pmin(pmax(apply(x, 2, rank) / n, npn_thresh), 1 - npn_thresh))
     x <- x / sd(x[, 1])
 
-    if(verbose){
-
-      cat("done.\n")
-    }
     rm(n, d, npn_thresh, verbose)
 
    	colnames(x) <- x_col
@@ -72,15 +62,11 @@ npn <- function(x, npn_func = "shrinkage", npn_thresh = NULL, verbose = TRUE){
 	if(npn_func == "skeptic"){
 		if(verbose){
 
-		  cat("Nonparanormal transformation conducted via skeptic....")
+		  message("Nonparanormal transformation via skeptic...\n")
 
 		}
 		x <- 2*sin(pi / 6*cor(x, method="spearman"))
 
-		if(verbose){
-
-		  cat("done.\n")
-		}
 		rm(n, d, verbose)
 
    	colnames(x) <- x_col

@@ -61,7 +61,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
   if(ncol(X) == ncol(Y)){
     p <- ncol(X)
   }else{
-    cat("The dimensions of the matrices are inconsistent.")
+    warning("The dimensions of the matrices are inconsistent.")
     return(NULL)
   }
 
@@ -70,39 +70,38 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
   }
 
   if(gamma > 1 || gamma < 0){
-    cat("Please provide an appropriate value for gamma.")
+    warning("Please provide an appropriate value for gamma.")
     return(NULL)
   }
 
   if(!is.null(lambdas)){
     if(lengths(lambdas) > 1){
-      cat("Please provide a 1-dimensional vector of lambda values.")
+      warning("Please provide a 1-dimensional vector of lambda values.")
       return(NULL)
     }
   }
 
   if((lambda_min_ratio <= 0) || (length(lambda_min_ratio) > 1)){
-    cat("Please provide a valid, single value for the smallest value of lambda.")
+    warning("Please provide a valid, single value for the smallest value of lambda.")
     return(NULL)
   }
 
   if((nlambda < 1) || (nlambda %% 1 != 0) || length(nlambda) > 1){
-    cat("Please provide a valid number of lambda values.")
+    warning("Please provide a valid number of lambda values.")
     return(NULL)
   }
 
   losses <- c("d-trace", "lasso", "mcp", "scad")
 
   if(!is.element(loss, losses)){
-    paste(c("Please select an appropriate loss function from the following list: ", losses))
+    warning("Please select an appropriate loss function.")
     return(NULL)
   }
 
   tuning_options <- c("none","AIC","BIC", "EBIC")
 
   if(!is.element(tuning, tuning_options)){
-    cat("Please select an appropriate tuning procedure.")
-    paste(c("Please select an appropriate tuning procedure from the following list: ", tuning_options))
+    warning("Please select an appropriate tuning procedure.")
     return(NULL)
   }
 
@@ -115,45 +114,45 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
   perturb_options <- c(F, FALSE, T, TRUE)
 
   if(!is.element(perturb, perturb_options)){
-    cat("Please select either TRUE or FALSE for whether to perturb.")
+    warning("Please select either TRUE or FALSE for whether to perturb.")
     return(NULL)
   }
 
   if((stop_tol < 0) || (length(stop_tol) > 1)){
-    cat("Please provide a valid stop tolerance.")
+    warning("Please provide a valid stop tolerance.")
     return(NULL)
   }
 
   if((max_iter < 1) || (length(max_iter) > 1)){
-    cat("Please provide a valid maximum number of iterations.")
+    warning("Please provide a valid maximum number of iterations.")
     return(NULL)
   }
 
   correlation_options <- c(F, FALSE, T, TRUE)
 
   if(!is.element(correlation, correlation_options)){
-    cat("Please select either TRUE or FALSE for whether to use the correlation matrices.")
+    warning("Please select either TRUE or FALSE for whether to use the correlation matrices.")
     return(NULL)
   }
 
   lip_options <- c(F, FALSE, T, TRUE)
 
   if(!is.element(lipschitz, lip_options)){
-    cat("Please select either TRUE or FALSE for whether to print the lipschitz constant.")
+    warning("Please select either TRUE or FALSE for whether to print the lipschitz constant.")
     return(NULL)
   }
 
   if(!is.null(Delta_init)){
     if(nrow(Delta_init) != p){
-      cat("The provided data and differential network have inconsistent dimensions.")
+      warning("The provided data and differential network have inconsistent dimensions.")
       return(NULL)
     }
     if(nrow(Delta_init) != ncol(Delta_init)){
-      cat("The provided differential network is not square.")
+      warning("The provided differential network is not square.")
       return(NULL)
     }
     if(!isSymmetric(Delta_init)){
-      cat("The provided differential network is not symmetric.")
+      warning("The provided differential network is not symmetric.")
       return(NULL)
     }
   }
@@ -206,12 +205,12 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
   width <- getOption("width")
   separator <- strrep("-", width)
-  cat(paste0(separator))
-  cat("\n")
+  message(paste0(separator))
+  message("\n")
 
   if(lipschitz){
 
-    cat("The Lipschitz constant is: ", round(lip,3), "\n")
+    message("The Lipschitz constant is: ", round(lip,3), "\n")
 
     }
 
@@ -351,9 +350,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
   if(max_iter %in% fit$iter){
 
-    cat("\n")
-    cat("The ADMM did not converge for one or more lambdas.")
-    cat("\n")
+    message("The ADMM did not converge for one or more lambdas.")
 
   }
 
@@ -363,36 +360,6 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
   rm(X, Y, Delta)
   class(fit) <- "diffnet"
-
-  print.diffnet <- function(x, ...)
-  {
-
-    width <- getOption("width")
-    separator <- strrep("-", width)
-
-    cat(paste0(separator))
-    cat("\n")
-    if(x$loss == "lasso"){
-      cat("Model: Estimation was perform via Graphical LASSO.\n")
-    }
-    else if(x$loss == "mcp"){
-      cat("Model: Estimation was perform via minimax concave penalty.\n")
-    }
-    else if(x$loss == "scad"){
-      cat("Model: Estimation was perform via smoothly clipped absolute deviation penalty.\n")
-    }else if(x$loss == "d-trace"){
-      cat("Model: Estimation was perform via D-trace.\n")
-    }
-
-    cat("Number of lambdas:",length(x$lambda),"\n")
-    cat("Graph dimension:",ncol(x$Sigma_X),"\n")
-    cat("Range of lambda values considered:", min(x$lambdas), "----->", max(x$lambdas),"\n")
-    cat("Levels of sparsity of Delta encountered:", min(x$sparsity), "----->", max(x$sparsity),"\n")
-    cat(paste(separator))
-    cat("\n")
-  }
-
-  print.diffnet(fit)
 
   output <- list()
 
@@ -413,24 +380,10 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
   tuning_output <- c("AIC", "BIC", "EBIC")
 
   if(is.element(tuning, tuning_output)){
-    cat("The results of the parameter selection are as follows:\n")
-    width <- getOption("width")
-    separator <- strrep("-", width)
-    cat(paste0(separator))
 
     ic_index <- tuning_results$opt[[1]][[1]]
     ic_value <- tuning_results$opt[[2]][[1]]
     chosen_lambda_ic <- lambdas[ic_index]
-
-    tab <- matrix(c(tuning, ic_index, ic_value, chosen_lambda_ic), ncol=1, byrow=TRUE)
-    colnames(tab) <- c('Optimal Information Criteria')
-    rownames(tab) <- c('Selected Information Criterion','Lambda Index','Information Criteria Value', 'Lambda Value')
-    tab <- as.table(tab)
-
-    print(tab)
-    cat("\n")
-    cat(paste0(separator))
-    cat("\n")
 
     output$ic_index <- ic_index
     output$ic_value <- ic_value
@@ -439,15 +392,6 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
     loss_index <- tuning_results$opt[[1]][[2]]
     loss_value <- tuning_results$opt[[2]][[2]]
     chosen_lambda_loss <- lambdas[loss_index]
-
-    tab <- matrix(c(loss, loss_index, loss_value, chosen_lambda_loss), ncol=1, byrow=TRUE)
-    colnames(tab) <- c('Minimum Loss Value')
-    rownames(tab) <- c('Selected Loss Function','Lambda Index','Loss Function Value', 'Lambda Value')
-    tab <- as.table(tab)
-
-    print(tab)
-    cat("\n")
-    cat(paste0(separator))
 
     output$loss_index <- loss_index
     output$loss_value <- loss_value
