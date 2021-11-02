@@ -21,14 +21,13 @@ test_that("estimation behaves as expected", {
   nlambda <- 3
   tuning <- "none"
   stop_tol <- 1e-4
-  lipschitz <- T
   perturb <- F
   correlation <- F
   max_iter <- 500
   lambda_min_ratio <- 0.5
 
   result <- estimation(X, Y, loss = loss, nlambda = nlambda, tuning = tuning, stop_tol = stop_tol,
-                       lipschitz = lipschitz, perturb = perturb, correlation = correlation,
+                       perturb = perturb, correlation = correlation,
                        max_iter = max_iter, lambda_min_ratio = lambda_min_ratio)
 
   expect_equal(result$lip, 30.50836, tolerance = 0.0001)

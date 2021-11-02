@@ -17,7 +17,6 @@ estimation(
   stop_tol = 1e-05,
   max_iter = 500,
   correlation = FALSE,
-  lipschitz = FALSE,
   Delta_init = NULL,
   rho = NULL,
   gamma = NULL
@@ -47,8 +46,6 @@ estimation(
 \item{max_iter}{Optional parameter - The maximum number of iterations that can be perform for any one regularization value. Defaults to 100.}
 
 \item{correlation}{Optional parameter - Determines whether the sample correlation matrices should be used in the place of the sample covariance matrices. Choices are TRUE and FALSE with the function defaulting to FALSE.}
-
-\item{lipschitz}{Optional parameter - Whether the lipschitz constant is printed or not. Choices are TRUE or FALSE, with the default being FALSE.}
 
 \item{Delta_init}{Optional parameter - Allows for the algorithm to provided an initial estimate of the differential network to ease computation.}
 

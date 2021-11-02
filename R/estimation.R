@@ -16,7 +16,6 @@
 #' @param stop_tol Optional parameter - The stop tolerance to determine whether convergence has occurred. Defaults to 1e-5.
 #' @param max_iter Optional parameter - The maximum number of iterations that can be perform for any one regularization value. Defaults to 100.
 #' @param correlation Optional parameter - Determines whether the sample correlation matrices should be used in the place of the sample covariance matrices. Choices are TRUE and FALSE with the function defaulting to FALSE.
-#' @param lipschitz Optional parameter - Whether the lipschitz constant is printed or not. Choices are TRUE or FALSE, with the default being FALSE.
 #' @param Delta_init Optional parameter - Allows for the algorithm to provided an initial estimate of the differential network to ease computation.
 #' @param rho Optional parameter - Allows the user to adjust the ADMM step-size. Defaults to 1.
 #' @param gamma Optional parameter - Allows the user to adjust the EBIC value when EBIC is the selected tuning method. Defaults to 0.5.
@@ -55,7 +54,7 @@
 
 estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 10, a = NULL,
                       loss = "lasso", tuning = "none", perturb = FALSE, stop_tol = 1e-5,
-                      max_iter = 500, correlation = FALSE, lipschitz = FALSE, Delta_init = NULL, rho=NULL, gamma=NULL){
+                      max_iter = 500, correlation = FALSE, Delta_init = NULL, rho=NULL, gamma=NULL){
 
   # Warning messages
   if(ncol(X) == ncol(Y)){
@@ -135,13 +134,6 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
     return(NULL)
   }
 
-  lip_options <- c(F, FALSE, T, TRUE)
-
-  if(!is.element(lipschitz, lip_options)){
-    warning("Please select either TRUE or FALSE for whether to print the lipschitz constant.")
-    return(NULL)
-  }
-
   if(!is.null(Delta_init)){
     if(nrow(Delta_init) != p){
       warning("The provided data and differential network have inconsistent dimensions.")
@@ -207,12 +199,6 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
   separator <- strrep("-", width)
   message(paste0(separator))
   message("\n")
-
-  if(lipschitz){
-
-    message("The Lipschitz constant is: ", round(lip,3), "\n")
-
-    }
 
   fit$lip <- lip
 
@@ -346,7 +332,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
   # Now we have the ADMM results for each of the supplied lambdas, it is necessary to see which lambda results
   # in the best fit and select that as the final solution
 
-  cat(paste0(separator))
+  message(paste0(separator))
 
   if(max_iter %in% fit$iter){
 
