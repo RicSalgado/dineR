@@ -26,7 +26,7 @@ npn <- function(x, npn_func = "shrinkage", npn_thresh = NULL, verbose = TRUE){
 	if(npn_func == "shrinkage"){
 		if(verbose){
 
-		  message("Nonparanormal transformation via shrunken ECDF...\n")
+		  message("Nonparanormal transformation via shrunken ECDF.\n")
 
 		}
 
@@ -42,7 +42,7 @@ npn <- function(x, npn_func = "shrinkage", npn_thresh = NULL, verbose = TRUE){
 	if(npn_func == "truncation"){
 		if(verbose){
 
-		  message("Nonparanomral transformation via truncated ECDF...\n")
+		  message("Nonparanomral transformation via truncated ECDF.\n")
 
 		}
 	  if(is.null(npn_thresh)){
@@ -62,7 +62,7 @@ npn <- function(x, npn_func = "shrinkage", npn_thresh = NULL, verbose = TRUE){
 	if(npn_func == "skeptic"){
 		if(verbose){
 
-		  message("Nonparanormal transformation via skeptic...\n")
+		  message("Nonparanormal transformation via skeptic.\n")
 
 		}
 		x <- 2*sin(pi / 6*cor(x, method="spearman"))

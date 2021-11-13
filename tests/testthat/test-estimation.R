@@ -30,8 +30,8 @@ test_that("estimation behaves as expected", {
                        perturb = perturb, correlation = correlation,
                        max_iter = max_iter, lambda_min_ratio = lambda_min_ratio)
 
-  expect_equal(result$lip, 30.50836, tolerance = 0.0001)
-  expect_equal(max(result$lambdas), 0.7283955, tolerance = 0.0001)
-  expect_equal(min(result$lambdas), 0.3641978, tolerance = 0.0001)
+  expect_equal(length(result$lambdas), nlambda)
+  expect_equal(result$n_X, n_X)
+  expect_equal(ncol(result$Sigma_X), p_X)
 
 })

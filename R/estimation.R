@@ -19,6 +19,7 @@
 #' @param Delta_init Optional parameter - Allows for the algorithm to provided an initial estimate of the differential network to ease computation.
 #' @param rho Optional parameter - Allows the user to adjust the ADMM step-size. Defaults to 1.
 #' @param gamma Optional parameter - Allows the user to adjust the EBIC value when EBIC is the selected tuning method. Defaults to 0.5.
+#' @param verbose Optional parameter - Allows the user to obtain a summary of the estimation results. Options are TRUE or FALSE, where FALSE indicates the summary is not provided. Defaults to FALSE.
 #'
 #' @return A list of various outputs, namely:
 #' \itemize{
@@ -54,7 +55,7 @@
 
 estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 10, a = NULL,
                       loss = "lasso", tuning = "none", perturb = FALSE, stop_tol = 1e-5,
-                      max_iter = 500, correlation = FALSE, Delta_init = NULL, rho=NULL, gamma=NULL){
+                      max_iter = 500, correlation = FALSE, Delta_init = NULL, rho=NULL, gamma=NULL, verbose = FALSE){
 
   # Warning messages
   if(ncol(X) == ncol(Y)){
@@ -354,7 +355,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
   output$Sigma_X <- fit$Sigma_X
   output$Sigma_Y <- fit$Sigma_Y
   output$loss <- fit$loss
-  output$tuning <- fit$tuning
+  output$tuning <- tuning
   output$lip <- fit$lip
   output$iter <- fit$iter
   output$elapse <- fit$elapse
@@ -382,6 +383,12 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
     output$loss_index <- loss_index
     output$loss_value <- loss_value
     output$chosen_lambda_loss <- chosen_lambda_loss
+  }
+
+  if(verbose == TRUE){
+
+    summary.estimation(output)
+
   }
 
   return(output)
@@ -437,4 +444,61 @@ L1_dts <- function(SigmaX, SigmaY, rho, lambda, Delta0 = NULL, Lambda0 = NULL,
   result$iter <- iter
 
   return(result)
+}
+
+summary.estimation <- function(x){
+
+  width <- getOption("width")
+  separator <- strrep("-", width)
+
+  cat(paste0(separator))
+  cat("\n")
+  if(x$loss == "lasso"){
+    cat("Model: Estimation was perform via Graphical LASSO.\n")
+  }
+  else if(x$loss == "mcp"){
+    cat("Model: Estimation was perform via minimax concave penalty.\n")
+  }
+  else if(x$loss == "scad"){
+    cat("Model: Estimation was perform via smoothly clipped absolute deviation penalty.\n")
+  }else if(x$loss == "d-trace"){
+    cat("Model: Estimation was perform via D-trace.\n")
+  }
+
+  cat("Number of lambdas:",length(x$lambda),"\n")
+  cat("Graph dimension:",ncol(x$Sigma_X),"\n")
+  cat("Range of lambda values considered:", min(x$lambdas), "----->", max(x$lambdas),"\n")
+  cat("Levels of sparsity of Delta encountered:", min(x$sparsity), "----->", max(x$sparsity),"\n")
+  cat(paste(separator))
+  cat("\n")
+
+  tuning_output <- c("AIC", "BIC", "EBIC")
+
+  if(is.element(x$tuning, tuning_output)){
+    cat("The results of the parameter selection are as follows:\n")
+    width <- getOption("width")
+    separator <- strrep("-", width)
+    cat(paste0(separator))
+
+    tab <- matrix(c(x$tuning, x$ic_index, x$ic_value, x$chosen_lambda_ic), ncol=1, byrow=TRUE)
+    colnames(tab) <- c('Optimal Information Criteria')
+    rownames(tab) <- c('Selected Information Criterion','Lambda Index','Information Criteria Value', 'Lambda Value')
+    tab <- as.table(tab)
+
+    print(tab)
+    cat("\n")
+    cat(paste0(separator))
+    cat("\n")
+
+    tab <- matrix(c(x$loss, x$loss_index, x$loss_value, x$chosen_lambda_loss), ncol=1, byrow=TRUE)
+    colnames(tab) <- c('Minimum Loss Value')
+    rownames(tab) <- c('Selected Loss Function','Lambda Index','Loss Function Value', 'Lambda Value')
+    tab <- as.table(tab)
+
+    print(tab)
+    cat("\n")
+    cat(paste0(separator))
+
+  }
+
 }

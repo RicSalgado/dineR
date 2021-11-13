@@ -14,6 +14,6 @@ test_that("data_generator produces expected data", {
   X <- data$X
   Y <- data$Y
 
-  expect_equal(mean(X), -0.0006752547, tolerance = 0.0001)
+  expect_equal(length(X), 10000)
 
 })
