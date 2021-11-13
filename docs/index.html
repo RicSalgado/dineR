@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">dineR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
       </span>
     </div>
 
@@ -119,7 +119,6 @@
 <span class="va">nlambda</span> <span class="op">&lt;-</span> <span class="fl">50</span>
 <span class="va">tuning</span> <span class="op">&lt;-</span> <span class="st">"AIC"</span>
 <span class="va">stop_tol</span> <span class="op">&lt;-</span> <span class="fl">1e-4</span>
-<span class="va">lipschitz</span> <span class="op">&lt;-</span> <span class="cn">T</span>
 <span class="va">perturb</span> <span class="op">&lt;-</span> <span class="cn">F</span>
 <span class="va">correlation</span> <span class="op">&lt;-</span> <span class="cn">F</span>
 <span class="va">max_iter</span> <span class="op">&lt;-</span> <span class="fl">500</span>
@@ -129,7 +128,7 @@
 <span class="co"># Estimation</span>
 
 <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/estimation.html">estimation</a></span><span class="op">(</span><span class="va">X</span>, <span class="va">Y</span>, loss <span class="op">=</span> <span class="va">loss</span>, nlambda <span class="op">=</span> <span class="va">nlambda</span>, tuning <span class="op">=</span> <span class="va">tuning</span>, stop_tol <span class="op">=</span> <span class="va">stop_tol</span>,
-                      lipschitz <span class="op">=</span> <span class="va">lipschitz</span>, perturb <span class="op">=</span> <span class="va">perturb</span>, correlation <span class="op">=</span> <span class="va">correlation</span>,
+                      perturb <span class="op">=</span> <span class="va">perturb</span>, correlation <span class="op">=</span> <span class="va">correlation</span>,
                       max_iter <span class="op">=</span> <span class="va">max_iter</span>, lambda_min_ratio <span class="op">=</span> <span class="va">lambda_min_ratio</span><span class="op">)</span> 
 
 <span class="co"># Results</span>
@@ -144,6 +143,8 @@
     <div class="links">
 <h2>Links</h2>
 <ul class="list-unstyled">
+<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=dineR">https://​cloud.r-project.org/​package=dineR</a>
+</li>
 <li>Browse source code at <br><a href="https://github.com/RicSalgado/dineR/">https://​github.com/​RicSalgado/​dineR/​</a>
 </li>
 <li>Report a bug at <br><a href="https://github.com/RicSalgado/dineR/issues">https://​github.com/​RicSalgado/​dineR/​issues</a>
@@ -155,6 +156,12 @@
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
 <li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
+</ul>
+</div>
+<div class="community">
+<h2>Community</h2>
+<ul class="list-unstyled">
+<li><a href="CODE_OF_CONDUCT.html">Code of conduct</a></li>
 </ul>
 </div>
 <div class="developers">
@@ -185,4 +192,3 @@
 
   </body>
 </html>
- 

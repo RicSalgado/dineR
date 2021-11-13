@@ -19,7 +19,8 @@ estimation(
   correlation = FALSE,
   Delta_init = NULL,
   rho = NULL,
-  gamma = NULL
+  gamma = NULL,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -52,6 +53,8 @@ estimation(
 \item{rho}{Optional parameter - Allows the user to adjust the ADMM step-size. Defaults to 1.}
 
 \item{gamma}{Optional parameter - Allows the user to adjust the EBIC value when EBIC is the selected tuning method. Defaults to 0.5.}
+
+\item{verbose}{Optional parameter - Allows the user to obtain a summary of the estimation results. Options are TRUE or FALSE, where FALSE indicates the summary is not provided. Defaults to FALSE.}
 }
 \value{
 A list of various outputs, namely:

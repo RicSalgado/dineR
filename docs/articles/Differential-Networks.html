@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">dineR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
       </span>
     </div>
 
@@ -123,18 +123,13 @@
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimation.html">estimation</a></span><span class="op">(</span><span class="va">X</span>, <span class="va">Y</span>, loss <span class="op">=</span> <span class="va">loss</span>, nlambda <span class="op">=</span> <span class="va">nlambda</span>, tuning <span class="op">=</span> <span class="va">tuning</span><span class="op">)</span>
 <span class="co">#&gt; --------------------------------------------------------------------------------</span>
-<span class="co">#&gt; ----------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
-<span class="co">#&gt; Model: Estimation was perform via Graphical LASSO.</span>
-<span class="co">#&gt; Number of lambdas: 3 </span>
-<span class="co">#&gt; Graph dimension: 100 </span>
-<span class="co">#&gt; Range of lambda values considered: 0.2185187 -----&gt; 0.7283955 </span>
-<span class="co">#&gt; Levels of sparsity of Delta encountered: 0 -----&gt; 0.09242424 </span>
+<span class="co">#&gt; </span>
 <span class="co">#&gt; --------------------------------------------------------------------------------</span></code></pre></div>
 <p>While the estimation process is busy, a progress bar should appear within the R Console showing the status of the optimization along with an estimated time remaining. The estimation then returns a great deal of items, and more if tuning is performed. For an overview on the items returned we can do the following:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>
-<span class="co">#&gt;  [1] "n_X"      "n_Y"      "Sigma_X"  "Sigma_Y"  "loss"     "lip"     </span>
-<span class="co">#&gt;  [7] "iter"     "elapse"   "lambdas"  "sparsity" "path"</span></code></pre></div>
+<span class="co">#&gt;  [1] "n_X"      "n_Y"      "Sigma_X"  "Sigma_Y"  "loss"     "tuning"  </span>
+<span class="co">#&gt;  [7] "lip"      "iter"     "elapse"   "lambdas"  "sparsity" "path"</span></code></pre></div>
 <p>In the above output, arguably the most important component is the “path” which is the final differential network estimate for each of the lambdas for the chosen loss function. As such, in the above example “path” consists of 50 different estimates, one for each lambda.</p>
 </div>
   </div>

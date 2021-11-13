@@ -74,7 +74,7 @@ two samples of multivariate normal data." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">dineR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
       </span>
     </div>
 
@@ -146,10 +146,10 @@ two samples of multivariate normal data.</p>
   stop_tol <span class='op'>=</span> <span class='fl'>1e-05</span>,
   max_iter <span class='op'>=</span> <span class='fl'>500</span>,
   correlation <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  lipschitz <span class='op'>=</span> <span class='cn'>FALSE</span>,
   Delta_init <span class='op'>=</span> <span class='cn'>NULL</span>,
   rho <span class='op'>=</span> <span class='cn'>NULL</span>,
-  gamma <span class='op'>=</span> <span class='cn'>NULL</span>
+  gamma <span class='op'>=</span> <span class='cn'>NULL</span>,
+  verbose <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -204,10 +204,6 @@ two samples of multivariate normal data.</p>
       <td><p>Optional parameter - Determines whether the sample correlation matrices should be used in the place of the sample covariance matrices. Choices are TRUE and FALSE with the function defaulting to FALSE.</p></td>
     </tr>
     <tr>
-      <th>lipschitz</th>
-      <td><p>Optional parameter - Whether the lipschitz constant is printed or not. Choices are TRUE or FALSE, with the default being FALSE.</p></td>
-    </tr>
-    <tr>
       <th>Delta_init</th>
       <td><p>Optional parameter - Allows for the algorithm to provided an initial estimate of the differential network to ease computation.</p></td>
     </tr>
@@ -218,6 +214,10 @@ two samples of multivariate normal data.</p>
     <tr>
       <th>gamma</th>
       <td><p>Optional parameter - Allows the user to adjust the EBIC value when EBIC is the selected tuning method. Defaults to 0.5.</p></td>
+    </tr>
+    <tr>
+      <th>verbose</th>
+      <td><p>Optional parameter - Allows the user to obtain a summary of the estimation results. Options are TRUE or FALSE, where FALSE indicates the summary is not provided. Defaults to FALSE.</p></td>
     </tr>
     </table>
 
@@ -251,14 +251,7 @@ two samples of multivariate normal data.</p>
 <span class='va'>X</span> <span class='op'>&lt;-</span> <span class='va'>data</span><span class='op'>$</span><span class='va'>X</span>
 <span class='va'>Y</span> <span class='op'>&lt;-</span> <span class='va'>data</span><span class='op'>$</span><span class='va'>Y</span>
 <span class='va'>result</span> <span class='op'>&lt;-</span> <span class='fu'>estimation</span><span class='op'>(</span><span class='va'>X</span>,<span class='va'>Y</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; --------------------------------------------------------------------------------
-#&gt; ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-#&gt; Model: Estimation was perform via Graphical LASSO.
-#&gt; Number of lambdas: 10 
-#&gt; Graph dimension: 50 
-#&gt; Range of lambda values considered: 0.1869421 -----&gt; 0.6231404 
-#&gt; Levels of sparsity of Delta encountered: 0 -----&gt; 0.1330612 
-#&gt; --------------------------------------------------------------------------------</div></pre>
+</div><div class='output co'>#&gt; <span class='message'>--------------------------------------------------------------------------------</span></div><div class='output co'>#&gt; <span class='message'></span></div><div class='output co'>#&gt; <span class='message'>--------------------------------------------------------------------------------</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
