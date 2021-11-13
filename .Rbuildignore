@@ -6,3 +6,4 @@
 ^\.travis\.yml$
 ^docs
 ^raw
+^CODE_OF_CONDUCT\.md$
