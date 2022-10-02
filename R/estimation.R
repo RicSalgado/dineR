@@ -19,7 +19,7 @@
 #' @param Delta_init Optional parameter - Allows for the algorithm to provided an initial estimate of the differential network to ease computation.
 #' @param rho Optional parameter - Allows the user to adjust the ADMM step-size. Defaults to 1.
 #' @param gamma Optional parameter - Allows the user to adjust the EBIC value when EBIC is the selected tuning method. Defaults to 0.5.
-#' @param cores Optional parameter - Allows the user to specify the number of cores used by the optimization. Defaults to 1, i.e sequential solving however appropriate values range from 2 to the minimum of the number of lambdas and the number of available cores.
+#' @param cores Optional parameter - Allows the user to specify the number of cores used by the optimization. Defaults to 1, i.e sequential solving however appropriate values range from 2 to the minimum of the number of lambdas and the total number of available cores.
 #' @param verbose Optional parameter - Allows the user to obtain a summary of the estimation results. Options are TRUE or FALSE, where FALSE indicates the summary is not provided. Defaults to FALSE.
 #'
 #' @return A list of various outputs, namely:
