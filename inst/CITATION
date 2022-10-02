@@ -1,0 +1,11 @@
+citHeader("To cite dineR in publications, please use:")
+
+citEntry(
+  entry       = "manual",
+  title       = "dineR - Differential Network Estimation in R",
+  author      = "Ricardo Marques",
+  year        = "2022",
+  url         = "https://github.com/RicSalgado/dineR",
+  textVersion = "R. Marques. dineR - Differential Network Estimation in R, 2022."
+)
+
