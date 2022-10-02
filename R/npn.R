@@ -23,55 +23,55 @@ npn <- function(x, npn_func = "shrinkage", npn_thresh = NULL, verbose = TRUE){
   x_row <- rownames(x)
 
   # Shrinkage transformation
-	if(npn_func == "shrinkage"){
-		if(verbose){
+  if(npn_func == "shrinkage"){
+    if(verbose){
 
-		  message("Nonparanormal transformation via shrunken ECDF.\n")
+      message("Nonparanormal transformation via shrunken ECDF.\n")
 
-		}
+    }
 
-		x <- qnorm(apply(x, 2, rank) / (n + 1))
-		x <- x / sd(x[, 1])
+    x <- qnorm(apply(x, 2, rank) / (n + 1))
+    x <- x / sd(x[, 1])
 
-		rm(n, d, verbose)
-   	colnames(x) <- x_col
-		rownames(x) <- x_row
-	}
+    rm(n, d, verbose)
+    colnames(x) <- x_col
+    rownames(x) <- x_row
+  }
 
-	# Truncation transformation
-	if(npn_func == "truncation"){
-		if(verbose){
+  # Truncation transformation
+  if(npn_func == "truncation"){
+    if(verbose){
 
-		  message("Nonparanomral transformation via truncated ECDF.\n")
+      message("Nonparanomral transformation via truncated ECDF.\n")
 
-		}
-	  if(is.null(npn_thresh)){
+    }
+    if(is.null(npn_thresh)){
 
-		  npn_thresh <- 1 / (4*(n^0.25)*sqrt(pi*log(n)))
-		}
+      npn_thresh <- 1 / (4*(n^0.25)*sqrt(pi*log(n)))
+    }
 
-	  x <- qnorm(pmin(pmax(apply(x, 2, rank) / n, npn_thresh), 1 - npn_thresh))
+    x <- qnorm(pmin(pmax(apply(x, 2, rank) / n, npn_thresh), 1 - npn_thresh))
     x <- x / sd(x[, 1])
 
     rm(n, d, npn_thresh, verbose)
 
-   	colnames(x) <- x_col
-		rownames(x) <- x_row
-	}
+    colnames(x) <- x_col
+    rownames(x) <- x_row
+  }
 
-	if(npn_func == "skeptic"){
-		if(verbose){
+  if(npn_func == "skeptic"){
+    if(verbose){
 
-		  message("Nonparanormal transformation via skeptic.\n")
+      message("Nonparanormal transformation via skeptic.\n")
 
-		}
-		x <- 2*sin(pi / 6*cor(x, method="spearman"))
+    }
+    x <- 2*sin(pi / 6*cor(x, method="spearman"))
 
-		rm(n, d, verbose)
+    rm(n, d, verbose)
 
-   	colnames(x) <- x_col
-		rownames(x) <- x_col
-	}
+    colnames(x) <- x_col
+    rownames(x) <- x_col
+  }
 
-	return(x)
+  return(x)
 }
