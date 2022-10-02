@@ -51,7 +51,10 @@
 #' @examples X <- data$X
 #' @examples Y <- data$Y
 #' @examples result <- estimation(X,Y)
-
+#'
+#' @import doParallel
+#' @import foreach
+#' @import parallel
 #' @import progress
 
 estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 10, a = NULL,

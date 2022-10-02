@@ -93,4 +93,5 @@ data <- data_generator(n = 100, p = 50, seed = 123)
 X <- data$X
 Y <- data$Y
 result <- estimation(X,Y)
+
 }
