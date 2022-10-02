@@ -156,9 +156,13 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
     }
   }
 
-  if((cores < 1) || (cores %% 1 != 0) || (cores > nlambda) || (cores > detectCores()) || length(cores) > 1){
+  if((cores < 1) || (cores %% 1 != 0) || (cores > (detectCores())-1) || length(cores) > 1){
     warning("Please provide a valid number of cores.")
     return(NULL)
+  }
+
+  if(cores > nlambda){
+    warning(paste("The number of cores you have specified is larger than the number of lambdas. Thus, only", cores, "core(s) are being used."))
   }
 
   #################################################################
@@ -765,7 +769,8 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
   if(cores != 1){
 
     start <- proc.time()[3]
-    for(i in 1:length(lambdas)){
+
+    foreach(i = 1:length(lambdas)) %do% {
 
       lambda <- lambdas[i] # Extract our chosen lambda
 
