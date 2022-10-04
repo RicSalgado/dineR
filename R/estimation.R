@@ -768,9 +768,12 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
   if(cores != 1){
 
+    cluster <- makeCluster(cores)
+    registerDoParallel(cluster)
+
     start <- proc.time()[3]
 
-    foreach(i = 1:length(lambdas)) %do% {
+    foreach(i = 1:length(lambdas)) %dopar% {
 
       lambda <- lambdas[i] # Extract our chosen lambda
 
@@ -907,6 +910,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
     }
 
+    stopCluster(cluster)
     return(output)
 
   }
