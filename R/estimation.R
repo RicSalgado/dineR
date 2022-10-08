@@ -765,14 +765,9 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
   # PARALLEL OPTIMIZATION
 
-  multiResultClass <- function(iterations = NULL, sparsity = NULL, path = NULL){
-    me <- list(iterations = iterations,
-               sparsity = sparsity,
-               path = path)
-
-    ## Set the name for the class
-    class(me) <- append(class(me),"multiResultClass")
-    return(me)
+  comb <- function(x, ...) {
+    lapply(seq_along(x),
+           function(i) c(x[[i]], lapply(list(...), function(y) y[[i]])))
   }
 
   if(cores != 1){
@@ -788,7 +783,10 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
     start <- proc.time()[3]
 
-    parallel_output <- foreach(i = 1:length(lambdas), .combine = rbind, .options.snow = opts) %dopar% {
+    parallel_output <- foreach(i = 1:length(lambdas), .combine = 'comb',
+                               .multicombine = TRUE,
+                               .init = list(list(), list(), list()),
+                               .options.snow = opts) %dopar% {
 
       iterations <- c()
       sparsity <- c()
@@ -862,19 +860,16 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
       sparsity[i] <- sum(Delta != 0) / p / (p-1)
       path[[i]] <- Matrix::Matrix(Delta, sparse = T)
 
-      parallel_results <- multiResultClass()
-      parallel_results$iterations <- iterations
-      parallel_results$sparsity <- sparsity
-      parallel_results$path <- path
-
-      return(parallel_results)
+      return(list(iterations, sparsity, path))
 
     }
 
-    #fit$iter <- parallel_output[[1]]$iterations
-    fit$iter <- parallel_output$iterations
-    #fit$sparsity <- parallel_output[[1]]$sparsity
-    #fit$path <- parallel_output[[1]]$path
+    fit$iter <- unlist(parallel_output[[1]])
+
+    sparsity_values <- unlist(parallel_output[[2]])
+    fit$sparsity <- sparsity_values[!is.na(unlist(sparsity_values))]
+
+    fit$path <- unlist(parallel_output[[3]])
 
     fit$elapse <-  proc.time()[3] - start
 
