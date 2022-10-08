@@ -20,6 +20,7 @@ estimation(
   Delta_init = NULL,
   rho = NULL,
   gamma = NULL,
+  cores = 1,
   verbose = FALSE
 )
 }
@@ -53,6 +54,8 @@ estimation(
 \item{rho}{Optional parameter - Allows the user to adjust the ADMM step-size. Defaults to 1.}
 
 \item{gamma}{Optional parameter - Allows the user to adjust the EBIC value when EBIC is the selected tuning method. Defaults to 0.5.}
+
+\item{cores}{Optional parameter - Allows the user to specify the number of cores used by the optimization. Defaults to 1, i.e sequential solving however appropriate values range from 2 to the minimum of the number of lambdas and the number of available cores.}
 
 \item{verbose}{Optional parameter - Allows the user to obtain a summary of the estimation results. Options are TRUE or FALSE, where FALSE indicates the summary is not provided. Defaults to FALSE.}
 }
@@ -90,4 +93,5 @@ data <- data_generator(n = 100, p = 50, seed = 123)
 X <- data$X
 Y <- data$Y
 result <- estimation(X,Y)
+
 }

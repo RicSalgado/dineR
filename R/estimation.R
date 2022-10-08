@@ -19,6 +19,7 @@
 #' @param Delta_init Optional parameter - Allows for the algorithm to provided an initial estimate of the differential network to ease computation.
 #' @param rho Optional parameter - Allows the user to adjust the ADMM step-size. Defaults to 1.
 #' @param gamma Optional parameter - Allows the user to adjust the EBIC value when EBIC is the selected tuning method. Defaults to 0.5.
+#' @param cores Optional parameter - Allows the user to specify the number of cores used by the optimization. Defaults to 1, i.e sequential solving however appropriate values range from 2 to the minimum of the number of lambdas and the total number of available cores.
 #' @param verbose Optional parameter - Allows the user to obtain a summary of the estimation results. Options are TRUE or FALSE, where FALSE indicates the summary is not provided. Defaults to FALSE.
 #'
 #' @return A list of various outputs, namely:
@@ -50,14 +51,19 @@
 #' @examples X <- data$X
 #' @examples Y <- data$Y
 #' @examples result <- estimation(X,Y)
-
+#'
+#' @import doParallel
+#' @import foreach
+#' @import parallel
 #' @import progress
 
 estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 10, a = NULL,
-                      loss = "lasso", tuning = "none", perturb = FALSE, stop_tol = 1e-5,
-                      max_iter = 500, correlation = FALSE, Delta_init = NULL, rho=NULL, gamma=NULL, verbose = FALSE){
+                       loss = "lasso", tuning = "none", perturb = FALSE, stop_tol = 1e-5,
+                       max_iter = 500, correlation = FALSE, Delta_init = NULL, rho=NULL, gamma=NULL,
+                       cores = 1, verbose = FALSE){
 
-  # Warning messages
+  # WARNING MESSAGES
+
   if(ncol(X) == ncol(Y)){
     p <- ncol(X)
   }else{
@@ -150,6 +156,363 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
     }
   }
 
+  if((cores < 1) || (cores %% 1 != 0) || (cores > (detectCores())-1) || length(cores) > 1){
+    warning("Please provide a valid number of cores.")
+    return(NULL)
+  }
+
+  if(cores > nlambda){
+    warning(paste("The number of cores you have specified is larger than the number of lambdas. Thus, only", cores, "core(s) are being used."))
+  }
+
+  #################################################################
+
+  # HELPER FUNCTIONS
+
+  soft <- function(X, Lambda){
+
+    Y <- X
+    Y <- (Y > Lambda)*(Y - Lambda) + (Y < (-Lambda)) * (Y + Lambda)
+    return(Y)
+
+  }
+
+  # The loss function when not in a high-dimensional setting
+
+  small_p_loss_func <- function(Sigma_X, Sigma_Y, diff_Sigma, Delta){
+
+    lf <- 0.5*sum(sum(Delta %*% (Sigma_X%*%Delta%*%Sigma_Y))) - sum(sum(Delta %*% diff_Sigma))
+    return(lf)
+
+  }
+
+  # The loss function accounting for high-dimensional situations
+
+  big_p_loss_func <- function(X, Y, diff_Sigma, Delta){
+
+    if(!isSymmetric(Delta)){
+      warning("The Delta matrix provided is not symmetric.")
+      return(NULL)
+    }
+
+    lf <- 0.5*sum(sum(Delta * t(X)%*%(X%*%Delta%*%t(Y)%*%Y))) - sum(sum(Delta * diff_Sigma))
+    return(lf)
+
+  }
+
+  # The penalty function of the loss function
+
+  penalty_func <- function(Delta, Lambda){
+
+    pl <- sum(sum(abs(Lambda * Delta)))
+    return(pl)
+
+  }
+
+  # This is the actual ADMM algorithm
+
+  diffnet_lasso <- function(pSigma_X, pSigma_Y, p, pLambda, pX, pY, n_X, n_Y, epsilon_X, epsilon_Y,
+                            lip, stop_tol, max_iter, pDelta){
+
+    Sigma_X <- as.matrix(pSigma_X, p, p)
+    Sigma_Y <- as.matrix(pSigma_Y, p, p)
+    Lambda <- as.matrix(pLambda, p, p)
+
+    diff_Sigma <- Sigma_X - Sigma_Y
+
+    X <- as.matrix(pX, n_X, p)
+    Y <- as.matrix(pY, n_Y, p)
+
+    Delta <- as.matrix(pDelta, p, p)
+    Delta_old <- Delta
+    Delta_extra <- Delta
+
+    grad_L <- matrix(NA, p, p)
+
+    t <- 1
+    t_old <- t
+
+    err <- 0
+    f_old <- 0
+    f <- 0
+
+    iter <- 0
+
+    # Everything above is simply defining each of the components within the optimization algorithm
+
+    if(n_X >= p || n_Y >= p){ # When the observations outnumber the variables i.e low dimensional setting
+
+      f <- small_p_loss_func(Sigma_X, Sigma_Y, diff_Sigma, Delta) + penalty_func(Delta, Lambda)
+
+    }else{ # If the above does not occur, then we need to use the adjusted loss function
+
+      f <- big_p_loss_func(X, Y, diff_Sigma, Delta) + penalty_func(Delta, Lambda)
+
+    }
+
+    # We then perform the iterative procedure until convergence
+
+    while((err > stop_tol) & (iter < max_iter) || iter == 0 ){
+
+      Delta_extra <- Delta + (t_old -  1) / t * (Delta - Delta_old)
+      Delta_old <- Delta
+
+      # Compute the gradient
+      if(n_X >= p || n_Y >= p){
+
+        grad_L <- Sigma_X%*%Delta_extra%*%Sigma_Y
+        grad_L <- (grad_L + t(grad_L)) / 2 - diff_Sigma
+
+      }else{
+
+        if(epsilon_X == 0 & epsilon_Y == 0){
+
+          grad_L <- t(X) %*% (X %*% Delta_extra %*% t(Y)) %*% Y
+          grad_L <- ( grad_L + t(grad_L) ) / 2 - diff_Sigma
+
+        }else{
+
+          grad_L <- t(X) %*% (X%*%Delta_extra%*%t(Y)) %*% Y  + epsilon_Y %*% t(X) %*% (X%*%Delta_extra) + epsilon_X %*% (Delta_extra%*%t(Y)) %*% Y + epsilon_X %*% epsilon_Y %*% Delta_extra
+          grad_L <- ( grad_L + t(grad_L) ) / 2 - diff_Sigma
+
+        }
+
+      }
+
+      # Apply the soft thresholding
+
+      Delta <- soft(Delta_extra - grad_L/lip, Lambda/lip)
+
+      f_old <- f
+
+      if(n_X >= p || n_Y >= p){
+
+        f <- small_p_loss_func(Sigma_X, Sigma_Y, diff_Sigma, Delta) + penalty_func(Delta, Lambda)
+
+      }else{
+
+        f <- big_p_loss_func(X, Y, diff_Sigma, Delta) + penalty_func(Delta, Lambda)
+
+      }
+
+      t_old <- t
+      t <- (1 + sqrt(1 + 4* t^2)) / 2
+
+      err <- (f_old - f)/(f_old + 1)
+      err <- abs(err)
+
+      iter <- iter + 1
+
+    }
+
+    output <- list()
+
+    output$iter <- iter
+    output$Delta <- Delta
+
+    return(output)
+
+  }
+
+  compute_mcp_lambda <- function(Delta, lambda, a){
+
+    weighted_lambda <- (Delta <= a*lambda) * (lambda - Delta/a)
+    return(weighted_lambda)
+  }
+
+  diffnet_mcp <- function(pSigma_X, pSigma_Y, p,
+                          lambda, a, pX, pY, n_X, n_Y,
+                          epsilon_X, epsilon_Y,
+                          lip, stop_tol, max_iter, pDelta){
+
+    Delta <- as.matrix(pDelta, p, p)
+
+    all_iter <- 0
+    iter <- all_iter
+
+    weighted_lambda <- compute_mcp_lambda(Delta, lambda, a)
+
+    output <- diffnet_lasso(pSigma_X, pSigma_Y, p, weighted_lambda, pX, pY, n_X, n_Y,
+                            epsilon_X, epsilon_Y,
+                            lip, stop_tol, max_iter, pDelta)
+
+    return(output)
+
+  }
+
+  BIG <- 1e20 # This is the upper bound for the scad penalty
+
+  compute_scad_lambda <- function(Delta, lambda, a){
+
+    weighted_lambda <- lambda * ((Delta <= lambda) + (Delta > lambda) * (pmax(pmin(a*lambda - Delta, 0), BIG) / (a-1) / lambda))
+    return(weighted_lambda)
+  }
+
+  diffnet_scad <- function(pSigma_X, pSigma_Y, p,
+                           lambda, a, pX, pY, n_X, n_Y,
+                           epsilon_X, epsilon_Y,
+                           lip, stop_tol, max_iter, pDelta){
+
+    Delta <- as.matrix(pDelta, p, p)
+    all_iter <- 0
+    iter <- all_iter
+
+    weighted_lambda <- compute_scad_lambda(abs(Delta), lambda, a)
+
+    output <- diffnet_lasso(pSigma_X, pSigma_Y, p, weighted_lambda, pX, pY, n_X, n_Y,
+                            epsilon_X, epsilon_Y,
+                            lip, stop_tol, max_iter, pDelta)
+
+    return(output)
+
+  }
+
+  loss_func <- function(Sigma_X, Sigma_Y, diff_Sigma, Delta){
+
+    lf <- 0.25*sum(sum(Delta * (Sigma_X%*%Delta%*%Sigma_Y))) + 0.25*sum(sum(Delta * (Sigma_Y%*%Delta%*%Sigma_X))) - sum(sum(Delta * diff_Sigma))
+    return(lf)
+
+  }
+
+  symmetric_admm <- function(pDelta0, pDelta3, pLambda0, pLambda3,
+                             pSigmaX, pSigmaY, rho,
+                             pC1, pC2, pUx, pUy, tol, p, lambda, max_iter){
+
+    SigmaX <- as.matrix(pSigmaX, p, p)
+
+    SigmaY <- as.matrix(pSigmaY, p, p)
+
+    diff_Sigma <- SigmaX - SigmaY
+
+    C1 <- as.matrix(pC1, p, p)
+    C2 <- as.matrix(pC2, p, p)
+
+    Ux <- as.matrix(pUx, p, p)
+    Uy <- as.matrix(pUy, p, p)
+
+    A <- matrix(NA, p, p)
+    B <- matrix(NA, p, p)
+    C <- matrix(NA, p ,p)
+
+    Delta1 <- as.matrix(pDelta0, p, p)
+    Delta2 <- as.matrix(pDelta0, p, p)
+    Delta3 <- as.matrix(pDelta3, p, p)
+
+    temp <- matrix(NA, p, p)
+
+    Lambda1 <- as.matrix(pLambda0, p, p)
+
+    Lambda2 <- as.matrix(pLambda0, p, p)
+
+    Lambda3 <- as.matrix(pLambda3, p, p)
+
+    iter <- 0
+    f_old <- 0
+    err <- 0
+
+    f <- loss_func(SigmaX, SigmaY, diff_Sigma, Delta3) + penalty_func(Delta3, lambda)
+
+    while(iter < max_iter){
+
+      A <- SigmaX - SigmaY + rho*Delta2 + rho*Delta3 + Lambda3 - Lambda1
+
+      Delta1 <- Uy %*% (C1 * (t(Uy)%*%A%*%Ux)) %*% t(Ux)
+
+      B <- SigmaX - SigmaY + rho*Delta1 + rho*Delta3 + Lambda1 - Lambda2
+
+      Delta2 <- Ux %*% (C2 *(t(Ux)%*%B%*%Uy)) %*% t(Uy)
+
+      C <- (Lambda2/rho - Lambda3/rho + Delta1 + Delta2) / 2
+
+      Delta3 <- soft(C, (lambda/rho) / 2)
+
+      temp <- Delta3
+
+      Delta3 <- (temp + t(temp))/2
+
+      f_old <- f
+      f <- loss_func(SigmaX, SigmaY, diff_Sigma, Delta3) + penalty_func(Delta3, lambda)
+
+      err <- (f_old - f) / (f_old + 1)
+      err <- abs(err)
+
+      Lambda1 <- Lambda1 + rho * (Delta1 - Delta2)
+      Lambda2 <- Lambda2 + rho * (Delta2 - Delta3)
+      Lambda3 <- Lambda3 + rho * (Delta3 - Delta1)
+
+      iter <- iter + 1
+
+      if ((err < tol & iter != 0) || iter == max_iter){
+
+        output <- list()
+        output$Delta3 <- Delta3
+        output$Lambda3 <- Lambda3
+        output$iter <- iter
+
+        return(output)
+
+      }
+
+    }
+
+  }
+
+  L1_dts <- function(SigmaX, SigmaY, rho, lambda, Delta0 = NULL, Lambda0 = NULL,
+                     Ux = NULL, Dx = NULL, Uy = NULL, Dy = NULL, C1 = NULL, C2 = NULL,
+                     stop.tol = stop.tol, max.iter = 1e3){
+
+    if(is.null(Delta0)) Delta0 <- solve(SigmaY+diag(nrow(SigmaY)))-solve(SigmaX+diag(nrow(SigmaX)))
+    if(is.null(Lambda0)) Lambda0 <- matrix(1,nrow(SigmaX),ncol(SigmaX))
+
+    p <- dim(Delta0)[1]
+    k <- 0
+    if(is.null(Ux) || is.null(Ux) || is.null(Uy) || is.null(Dy) || is.null(C1) || is.null(C2)){
+      M1 <- eigen(SigmaX)
+      M2 <- eigen(SigmaY)
+      Ux <- M1$vectors
+      Dx <- M1$values
+      Uy <- M2$vectors
+      Dy <- M2$values
+      C1 <- matrix(0,p,p)
+      C2 <- matrix(0,p,p)
+
+      for (i in 1:p){
+        for (j in 1:p){
+          C1[i,j] <- 1/(Dy[j]*Dx[i]+2*rho)
+          C2[i,j] <- 1/(Dy[i]*Dx[j]+2*rho)
+        }
+      }
+    }
+
+    Delta1 <- Delta0
+    Delta2 <- Delta0
+    Delta3 <- Delta0
+    Lambda1 <- Lambda0
+    Lambda2 <- Lambda0
+    Lambda3 <- Lambda0
+
+    l <- p^2
+    iter <- 0
+    admm <- symmetric_admm(Delta0, Delta3, Lambda0, Lambda0, SigmaX,
+                           SigmaY, rho, C1, C2,
+                           Ux, Uy, stop.tol, p, lambda, max.iter)
+
+    Lambda3 <- matrix(admm$Lambda3, p ,p)
+    Delta3 <- matrix(admm$Delta3, nrow=p, ncol=p)
+    iter <- admm$iter
+
+    result <- list()
+    result$Delta <- Delta3
+    result$Lambda3 <- Lambda3
+    result$iter <- iter
+
+    return(result)
+  }
+
+  #################################################################
+
+  # PREAMBLE TO OPTIMIZATION
+
   # Create a vector to save the output in
   fit <- list()
 
@@ -191,7 +554,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
   }else{
     epsilon_X <- 0
     epsilon_Y <- 0
-    }
+  }
 
   # Calculate the lipschitz constant
   lip <- eigen(fit$Sigma_X, symmetric = T, only.values = T)$value[1]*eigen(fit$Sigma_Y, symmetric = T, only.values = T)$value[1]
@@ -243,207 +606,339 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
   n_iter <- length(lambdas)
 
-  pb <- progress_bar$new(format = "(:spin) [:bar] :percent [Elapsed time: :elapsedfull || Estimated time remaining: :eta]",
+  pb <- progress_bar$new(format = "Lambda: :lambda [:bar] :percent [Elapsed time: :elapsedfull || Estimated time remaining: :eta]",
                          total = n_iter,
-                         complete = "=",
-                         incomplete = "-",
-                         current = ">",
                          clear = FALSE,
                          width = 100)
 
-  # This is entire estimation algorithm begins
+  progress_lambda <- seq(1:n_iter)
 
-  start <- proc.time()[3]
-  for(i in 1:length(lambdas)){
+  #################################################################
 
-    pb$tick()
+  # SEQUENTIAL OPTIMIZATION
 
-    lambda <- lambdas[i] # Extract our chosen lambda
+  if(cores == 1){
 
-    iter <- 0
-    Lambda <- matrix(lambda, p, p)
+    start <- proc.time()[3]
+    for(i in 1:length(lambdas)){
 
-    if(loss[1] == "lasso"){
-    out <- diffnet_lasso(fit$Sigma_X, fit$Sigma_Y, p,
-             Lambda, X, Y, n_X, n_Y,
-             epsilon_X, epsilon_Y,
-             lip, stop_tol, max_iter, Delta) # All of the parameters, including the selected lambda are given to the ADMM function
+      lambda <- lambdas[i] # Extract our chosen lambda
 
-             Delta <- matrix(out$Delta, ncol=p)
-             fit$iter[i] <- out$iter
+      iter <- 0
+      Lambda <- matrix(lambda, p, p)
 
-    }
-    if(loss[1] == "scad"){
-      out <- diffnet_scad(fit$Sigma_X, fit$Sigma_Y, p,
-               lambda, a, X, Y, n_X, n_Y,
-               epsilon_X, epsilon_Y,
-               lip, stop_tol, max_iter, Delta)
+      if(loss[1] == "lasso"){
+        out <- diffnet_lasso(fit$Sigma_X, fit$Sigma_Y, p,
+                             Lambda, X, Y, n_X, n_Y,
+                             epsilon_X, epsilon_Y,
+                             lip, stop_tol, max_iter, Delta) # All of the parameters, including the selected lambda are given to the ADMM function
 
-               Delta <- matrix(out$Delta, ncol=p)
-               fit$iter[i] <- out$iter
+        Delta <- matrix(out$Delta, ncol=p)
+        fit$iter[i] <- out$iter
 
-    }
-    if(loss[1] == "mcp"){
-      out <- diffnet_mcp(fit$Sigma_X, fit$Sigma_Y, p,
-               lambda, a, X, Y, n_X, n_Y,
-               epsilon_X, epsilon_Y,
-               lip, stop_tol, max_iter, Delta)
+      }
+      if(loss[1] == "scad"){
+        out <- diffnet_scad(fit$Sigma_X, fit$Sigma_Y, p,
+                            lambda, a, X, Y, n_X, n_Y,
+                            epsilon_X, epsilon_Y,
+                            lip, stop_tol, max_iter, Delta)
 
-               Delta <- matrix(out$Delta, ncol=p)
-               fit$iter[i] <- out$iter
+        Delta <- matrix(out$Delta, ncol=p)
+        fit$iter[i] <- out$iter
 
-    }
-    if(loss[1] == "d-trace"){
+      }
+      if(loss[1] == "mcp"){
+        out <- diffnet_mcp(fit$Sigma_X, fit$Sigma_Y, p,
+                           lambda, a, X, Y, n_X, n_Y,
+                           epsilon_X, epsilon_Y,
+                           lip, stop_tol, max_iter, Delta)
 
-      if(is.null(rho)){rho <- 1}
+        Delta <- matrix(out$Delta, ncol=p)
+        fit$iter[i] <- out$iter
 
-      M1 <- eigen(fit$Sigma_X)
-      M2 <- eigen(fit$Sigma_Y)
-      Ux <- M1$vectors
-      Dx <- M1$values
-      Uy <- M2$vectors
-      Dy <- M2$values
-      C1 <- matrix(0,p,p)
-      C2 <- matrix(0,p,p)
+      }
+      if(loss[1] == "d-trace"){
 
-      for (k in 1:p){
-        for (j in 1:p){
-          C1[k,j] <- 1/(Dy[j]*Dx[k]+2*rho)
-          C2[k,j] <- 1/(Dy[k]*Dx[j]+2*rho)
+        if(is.null(rho)){rho <- 1}
+
+        M1 <- eigen(fit$Sigma_X)
+        M2 <- eigen(fit$Sigma_Y)
+        Ux <- M1$vectors
+        Dx <- M1$values
+        Uy <- M2$vectors
+        Dy <- M2$values
+        C1 <- matrix(0,p,p)
+        C2 <- matrix(0,p,p)
+
+        for (k in 1:p){
+          for (j in 1:p){
+            C1[k,j] <- 1/(Dy[j]*Dx[k]+2*rho)
+            C2[k,j] <- 1/(Dy[k]*Dx[j]+2*rho)
+          }
         }
+
+        Delta0 <- solve(fit$Sigma_Y + diag(nrow(fit$Sigma_Y))) - solve(fit$Sigma_X + diag(nrow(fit$Sigma_X)))
+
+        Lambda0 <- matrix(0, p, p)
+
+        out <- L1_dts(fit$Sigma_X, fit$Sigma_Y, rho, lambda, Delta0, Lambda0, Ux, Dx, Uy, Dy, C1, C2, stop.tol = stop_tol, max.iter = max_iter)
+        Delta <- matrix(out$Delta, ncol=p)
+        fit$iter[i] <- out$iter
+
       }
 
-      Delta0 <- solve(fit$Sigma_Y + diag(nrow(fit$Sigma_Y))) - solve(fit$Sigma_X + diag(nrow(fit$Sigma_X)))
+      pb$tick(tokens = list(lambda = progress_lambda[i]))
 
-      Lambda0 <- matrix(0, p, p)
-
-      out <- L1_dts(fit$Sigma_X, fit$Sigma_Y, rho, lambda, Delta0, Lambda0, Ux, Dx, Uy, Dy, C1, C2, stop.tol = stop_tol, max.iter = max_iter)
-      Delta <- matrix(out$Delta, ncol=p)
-      fit$iter[i] <- out$iter
+      fit$path[[i]] <- Matrix::Matrix(Delta, sparse = T)
+      fit$sparsity[i] <- sum(Delta != 0) / p / (p-1)
 
     }
 
-    fit$path[[i]] <- Matrix::Matrix(Delta, sparse = T)
-    fit$sparsity[i] <- sum(Delta != 0) / p / (p-1)
+    fit$elapse <-  proc.time()[3] - start
 
-  }
+    # Now we have the ADMM results for each of the supplied lambdas, it is necessary to see which lambda results
+    # in the best fit and select that as the final solution
 
-  fit$elapse <-  proc.time()[3] - start
+    message(paste0(separator))
 
-  # Now we have the ADMM results for each of the supplied lambdas, it is necessary to see which lambda results
-  # in the best fit and select that as the final solution
+    if(max_iter %in% fit$iter){
 
-  message(paste0(separator))
+      message("The ADMM did not converge for one or more lambdas.")
 
-  if(max_iter %in% fit$iter){
-
-    message("The ADMM did not converge for one or more lambdas.")
-
-  }
-
-  if(!is.null(tuning)){
-    tuning_results <- selection(fit, gamma, tuning = tuning[1])
-  }
-
-  rm(X, Y, Delta)
-  class(fit) <- "diffnet"
-
-  output <- list()
-
-  output$n_X <- fit$n_X
-  output$n_Y <- fit$n_Y
-  output$Sigma_X <- fit$Sigma_X
-  output$Sigma_Y <- fit$Sigma_Y
-  output$loss <- fit$loss
-  output$tuning <- tuning
-  output$lip <- fit$lip
-  output$iter <- fit$iter
-  output$elapse <- fit$elapse
-  output$lambdas <- fit$lambdas
-  output$sparsity <- fit$sparsity
-  output$path <- fit$path
-  output$ic <- tuning_results$ic
-
-  tuning_output <- c("AIC", "BIC", "EBIC")
-
-  if(is.element(tuning, tuning_output)){
-
-    ic_index <- tuning_results$opt[[1]][[1]]
-    ic_value <- tuning_results$opt[[2]][[1]]
-    chosen_lambda_ic <- lambdas[ic_index]
-
-    output$ic_index <- ic_index
-    output$ic_value <- ic_value
-    output$chosen_lambda_ic <- chosen_lambda_ic
-
-    loss_index <- tuning_results$opt[[1]][[2]]
-    loss_value <- tuning_results$opt[[2]][[2]]
-    chosen_lambda_loss <- lambdas[loss_index]
-
-    output$loss_index <- loss_index
-    output$loss_value <- loss_value
-    output$chosen_lambda_loss <- chosen_lambda_loss
-  }
-
-  if(verbose == TRUE){
-
-    summary.estimation(output)
-
-  }
-
-  return(output)
-}
-
-L1_dts <- function(SigmaX, SigmaY, rho, lambda, Delta0 = NULL, Lambda0 = NULL,
-                   Ux = NULL, Dx = NULL, Uy = NULL, Dy = NULL, C1 = NULL, C2 = NULL,
-                   stop.tol = stop.tol, max.iter = 1e3){
-
-  if(is.null(Delta0)) Delta0 <- solve(SigmaY+diag(nrow(SigmaY)))-solve(SigmaX+diag(nrow(SigmaX)))
-  if(is.null(Lambda0)) Lambda0 <- matrix(1,nrow(SigmaX),ncol(SigmaX))
-
-  p <- dim(Delta0)[1]
-  k <- 0
-  if(is.null(Ux) || is.null(Ux) || is.null(Uy) || is.null(Dy) || is.null(C1) || is.null(C2)){
-    M1 <- eigen(SigmaX)
-    M2 <- eigen(SigmaY)
-    Ux <- M1$vectors
-    Dx <- M1$values
-    Uy <- M2$vectors
-    Dy <- M2$values
-    C1 <- matrix(0,p,p)
-    C2 <- matrix(0,p,p)
-
-    for (i in 1:p){
-      for (j in 1:p){
-        C1[i,j] <- 1/(Dy[j]*Dx[i]+2*rho)
-        C2[i,j] <- 1/(Dy[i]*Dx[j]+2*rho)
-      }
     }
+
+    if(!is.null(tuning)){
+      tuning_results <- selection(fit, gamma, tuning = tuning[1])
+    }
+
+    rm(X, Y, Delta)
+    class(fit) <- "diffnet"
+
+    output <- list()
+
+    output$n_X <- fit$n_X
+    output$n_Y <- fit$n_Y
+    output$Sigma_X <- fit$Sigma_X
+    output$Sigma_Y <- fit$Sigma_Y
+    output$loss <- fit$loss
+    output$tuning <- tuning
+    output$lip <- fit$lip
+    output$iter <- fit$iter
+    output$elapse <- fit$elapse
+    output$lambdas <- fit$lambdas
+    output$sparsity <- fit$sparsity
+    output$path <- fit$path
+    output$ic <- tuning_results$ic
+
+    tuning_output <- c("AIC", "BIC", "EBIC")
+
+    if(is.element(tuning, tuning_output)){
+
+      ic_index <- tuning_results$opt[[1]][[1]]
+      ic_value <- tuning_results$opt[[2]][[1]]
+      chosen_lambda_ic <- lambdas[ic_index]
+
+      output$ic_index <- ic_index
+      output$ic_value <- ic_value
+      output$chosen_lambda_ic <- chosen_lambda_ic
+
+      loss_index <- tuning_results$opt[[1]][[2]]
+      loss_value <- tuning_results$opt[[2]][[2]]
+      chosen_lambda_loss <- lambdas[loss_index]
+
+      output$loss_index <- loss_index
+      output$loss_value <- loss_value
+      output$chosen_lambda_loss <- chosen_lambda_loss
+    }
+
+    if(verbose == TRUE){
+
+      summary.estimation(output)
+
+    }
+
+    return(output)
+
   }
 
-  Delta1 <- Delta0
-  Delta2 <- Delta0
-  Delta3 <- Delta0
-  Lambda1 <- Lambda0
-  Lambda2 <- Lambda0
-  Lambda3 <- Lambda0
+  #######################################################
 
-  l <- p^2
-  iter <- 0
-  admm <- symmetric_admm(Delta0, Delta3, Lambda0, Lambda0, SigmaX,
-                        SigmaY, rho, C1, C2,
-                        Ux, Uy, stop.tol, p, lambda, max.iter)
+  # PARALLEL OPTIMIZATION
 
-  Lambda3 <- matrix(admm$Lambda3, p ,p)
-  Delta3 <- matrix(admm$Delta3, nrow=p, ncol=p)
-  iter <- admm$iter
+  comb <- function(x, ...) {
+    lapply(seq_along(x),
+           function(i) c(x[[i]], lapply(list(...), function(y) y[[i]])))
+  }
 
-  result <- list()
-  result$Delta <- Delta3
-  result$Lambda3 <- Lambda3
-  result$iter <- iter
+  if(cores != 1){
 
-  return(result)
+    cluster <- makeCluster(cores)
+    registerDoSNOW(cluster)
+
+    progress <- function(n){
+      pb$tick(tokens = list(lambda = progress_lambda[n]))
+    }
+
+    opts <- list(progress = progress)
+
+    start <- proc.time()[3]
+
+    parallel_output <- foreach(i = 1:length(lambdas), .combine = 'comb',
+                               .multicombine = TRUE,
+                               .init = list(list(), list(), list()),
+                               .options.snow = opts) %dopar% {
+
+      iterations <- c()
+      sparsity <- c()
+      path <- c()
+
+      lambda <- lambdas[i] # Extract our chosen lambda
+
+      iter <- 0
+      Lambda <- matrix(lambda, p, p)
+
+      if(loss[1] == "lasso"){
+        out <- diffnet_lasso(fit$Sigma_X, fit$Sigma_Y, p,
+                             Lambda, X, Y, n_X, n_Y,
+                             epsilon_X, epsilon_Y,
+                             lip, stop_tol, max_iter, Delta) # All of the parameters, including the selected lambda are given to the ADMM function
+
+        Delta <- matrix(out$Delta, ncol=p)
+        iterations <- c(iterations, out$iter)
+
+      }
+      if(loss[1] == "scad"){
+        out <- diffnet_scad(fit$Sigma_X, fit$Sigma_Y, p,
+                            lambda, a, X, Y, n_X, n_Y,
+                            epsilon_X, epsilon_Y,
+                            lip, stop_tol, max_iter, Delta)
+
+        Delta <- matrix(out$Delta, ncol=p)
+        iterations <- c(iterations, out$iter)
+
+      }
+      if(loss[1] == "mcp"){
+        out <- diffnet_mcp(fit$Sigma_X, fit$Sigma_Y, p,
+                           lambda, a, X, Y, n_X, n_Y,
+                           epsilon_X, epsilon_Y,
+                           lip, stop_tol, max_iter, Delta)
+
+        Delta <- matrix(out$Delta, ncol=p)
+        iterations <- c(iterations, out$iter)
+
+      }
+      if(loss[1] == "d-trace"){
+
+        if(is.null(rho)){rho <- 1}
+
+        M1 <- eigen(fit$Sigma_X)
+        M2 <- eigen(fit$Sigma_Y)
+        Ux <- M1$vectors
+        Dx <- M1$values
+        Uy <- M2$vectors
+        Dy <- M2$values
+        C1 <- matrix(0,p,p)
+        C2 <- matrix(0,p,p)
+
+        for (k in 1:p){
+          for (j in 1:p){
+            C1[k,j] <- 1/(Dy[j]*Dx[k]+2*rho)
+            C2[k,j] <- 1/(Dy[k]*Dx[j]+2*rho)
+          }
+        }
+
+        Delta0 <- solve(fit$Sigma_Y + diag(nrow(fit$Sigma_Y))) - solve(fit$Sigma_X + diag(nrow(fit$Sigma_X)))
+
+        Lambda0 <- matrix(0, p, p)
+
+        out <- L1_dts(fit$Sigma_X, fit$Sigma_Y, rho, lambda, Delta0, Lambda0, Ux, Dx, Uy, Dy, C1, C2, stop.tol = stop_tol, max.iter = max_iter)
+        Delta <- matrix(out$Delta, ncol=p)
+        iterations <- c(iterations, out$iter)
+
+      }
+
+      sparsity[i] <- sum(Delta != 0) / p / (p-1)
+      path[[i]] <- Matrix::Matrix(Delta, sparse = T)
+
+      return(list(iterations, sparsity, path))
+
+    }
+
+    fit$iter <- unlist(parallel_output[[1]])
+
+    sparsity_values <- unlist(parallel_output[[2]])
+    fit$sparsity <- sparsity_values[!is.na(unlist(sparsity_values))]
+
+    fit$path <- unlist(parallel_output[[3]])
+
+    fit$elapse <-  proc.time()[3] - start
+
+    # Now we have the ADMM results for each of the supplied lambdas, it is necessary to see which lambda results
+    # in the best fit and select that as the final solution
+
+    message(paste0(separator))
+
+    if(max_iter %in% fit$iter){
+
+      message("The ADMM did not converge for one or more lambdas.")
+
+    }
+
+    if(!is.null(tuning)){
+      tuning_results <- selection(fit, gamma, tuning = tuning[1])
+    }
+
+    rm(X, Y, Delta)
+    class(fit) <- "diffnet"
+
+    output <- list()
+
+    output$n_X <- fit$n_X
+    output$n_Y <- fit$n_Y
+    output$Sigma_X <- fit$Sigma_X
+    output$Sigma_Y <- fit$Sigma_Y
+    output$loss <- fit$loss
+    output$tuning <- tuning
+    output$lip <- fit$lip
+    output$iter <- fit$iter
+    output$elapse <- fit$elapse
+    output$lambdas <- fit$lambdas
+    output$sparsity <- fit$sparsity
+    output$path <- fit$path
+    output$ic <- tuning_results$ic
+
+    tuning_output <- c("AIC", "BIC", "EBIC")
+
+    if(is.element(tuning, tuning_output)){
+
+      ic_index <- tuning_results$opt[[1]][[1]]
+      ic_value <- tuning_results$opt[[2]][[1]]
+      chosen_lambda_ic <- lambdas[ic_index]
+
+      output$ic_index <- ic_index
+      output$ic_value <- ic_value
+      output$chosen_lambda_ic <- chosen_lambda_ic
+
+      loss_index <- tuning_results$opt[[1]][[2]]
+      loss_value <- tuning_results$opt[[2]][[2]]
+      chosen_lambda_loss <- lambdas[loss_index]
+
+      output$loss_index <- loss_index
+      output$loss_value <- loss_value
+      output$chosen_lambda_loss <- chosen_lambda_loss
+    }
+
+    if(verbose == TRUE){
+
+      summary.estimation(output)
+
+    }
+
+    stopCluster(cluster)
+    return(output)
+
+  }
+
 }
 
 summary.estimation <- function(x){

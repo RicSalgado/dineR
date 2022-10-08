@@ -2,9 +2,9 @@
 There were no ERRORs or WARNINGs or NOTES.
 
 ## Updates
-I have updated the package so that the errors encountered when running
-the tests on the following flavors: ATLAS M1mac MKL OpenBLAS 
-are no longer encountered. 
+I have updated the package to include the ability to perform the optimization through the use of parallel computing.
 
-I added the ability for the user to make use of verbose to print out a summary
-of the estimation results. 
+I have also added in several of the core references whose theory was consulted when developing the package. 
+
+Lastly, I have updated the Vignette's to be more comprehensive and cover the usage of the parallel parameter to perform parallel optimization. 
+

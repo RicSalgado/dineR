@@ -1,9 +1,11 @@
 library(testthat)
 test_that("selection behaves as expected", {
 
+  library(doParallel)
+  library(foreach)
   library(MASS)
+  library(parallel)
   library(progress)
-  library(Matrix)
 
   n_X <- 100
   n_Y <- n_X
