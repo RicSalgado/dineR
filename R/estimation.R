@@ -606,13 +606,12 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
   n_iter <- length(lambdas)
 
-  pb <- progress_bar$new(format = "(:spin) [:bar] :percent [Elapsed time: :elapsedfull || Estimated time remaining: :eta]",
+  pb <- progress_bar$new(format = "Lambda: :lambda [:bar] :percent [Elapsed time: :elapsedfull || Estimated time remaining: :eta]",
                          total = n_iter,
-                         complete = "=",
-                         incomplete = "-",
-                         current = ">",
                          clear = FALSE,
                          width = 100)
+
+  progress_lambda <- seq(1:n_iter)
 
   #################################################################
 
@@ -688,7 +687,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
       }
 
-      pb$tick()
+      pb$tick(tokens = list(lambda = progress_lambda[i]))
 
       fit$path[[i]] <- Matrix::Matrix(Delta, sparse = T)
       fit$sparsity[i] <- sum(Delta != 0) / p / (p-1)
@@ -769,11 +768,20 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
   if(cores != 1){
 
     cluster <- makeCluster(cores)
-    registerDoParallel(cluster)
+    registerDoSNOW(cluster)
+
+    progress <- function(n){
+      pb$tick(tokens = list(lambda = progress_lambda[n]))
+    }
+
+    opts <- list(progress = progress)
 
     start <- proc.time()[3]
 
-    foreach(i = 1:length(lambdas)) %dopar% {
+    parallel_output <- foreach(i = 1:length(lambdas), .combine = c, .options.snow = opts) %dopar% {
+
+      iterations <- c()
+      path <- c()
 
       lambda <- lambdas[i] # Extract our chosen lambda
 
@@ -787,7 +795,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
                              lip, stop_tol, max_iter, Delta) # All of the parameters, including the selected lambda are given to the ADMM function
 
         Delta <- matrix(out$Delta, ncol=p)
-        fit$iter[i] <- out$iter
+        iterations <- c(iterations, out$iter)
 
       }
       if(loss[1] == "scad"){
@@ -797,7 +805,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
                             lip, stop_tol, max_iter, Delta)
 
         Delta <- matrix(out$Delta, ncol=p)
-        fit$iter[i] <- out$iter
+        iterations <- c(iterations, out$iter)
 
       }
       if(loss[1] == "mcp"){
@@ -807,7 +815,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
                            lip, stop_tol, max_iter, Delta)
 
         Delta <- matrix(out$Delta, ncol=p)
-        fit$iter[i] <- out$iter
+        iterations <- c(iterations, out$iter)
 
       }
       if(loss[1] == "d-trace"){
@@ -836,16 +844,22 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
         out <- L1_dts(fit$Sigma_X, fit$Sigma_Y, rho, lambda, Delta0, Lambda0, Ux, Dx, Uy, Dy, C1, C2, stop.tol = stop_tol, max.iter = max_iter)
         Delta <- matrix(out$Delta, ncol=p)
-        fit$iter[i] <- out$iter
+        iterations <- c(iterations, out$iter)
 
       }
 
-      pb$tick()
+      path[[i]] <- Matrix::Matrix(Delta, sparse = T)
+      #fit$path[[i]] <- Matrix::Matrix(Delta, sparse = T)
+      #fit$sparsity[i] <- sum(Delta != 0) / p / (p-1)
 
-      fit$path[[i]] <- Matrix::Matrix(Delta, sparse = T)
-      fit$sparsity[i] <- sum(Delta != 0) / p / (p-1)
+      #return(fit)
+      return(path)
+
 
     }
+
+    #fit$iter <- parallel_output
+    fit$path <- parallel_output
 
     fit$elapse <-  proc.time()[3] - start
 
