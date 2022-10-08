@@ -765,6 +765,16 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
   # PARALLEL OPTIMIZATION
 
+  multiResultClass <- function(iterations = NULL, sparsity = NULL, path = NULL){
+    me <- list(iterations = iterations,
+               sparsity = sparsity,
+               path = path)
+
+    ## Set the name for the class
+    class(me) <- append(class(me),"multiResultClass")
+    return(me)
+  }
+
   if(cores != 1){
 
     cluster <- makeCluster(cores)
@@ -778,9 +788,10 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
     start <- proc.time()[3]
 
-    parallel_output <- foreach(i = 1:length(lambdas), .combine = c, .options.snow = opts) %dopar% {
+    parallel_output <- foreach(i = 1:length(lambdas), .combine = rbind, .options.snow = opts) %dopar% {
 
       iterations <- c()
+      sparsity <- c()
       path <- c()
 
       lambda <- lambdas[i] # Extract our chosen lambda
@@ -848,18 +859,22 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
       }
 
+      sparsity[i] <- sum(Delta != 0) / p / (p-1)
       path[[i]] <- Matrix::Matrix(Delta, sparse = T)
-      #fit$path[[i]] <- Matrix::Matrix(Delta, sparse = T)
-      #fit$sparsity[i] <- sum(Delta != 0) / p / (p-1)
 
-      #return(fit)
-      return(path)
+      parallel_results <- multiResultClass()
+      parallel_results$iterations <- iterations
+      parallel_results$sparsity <- sparsity
+      parallel_results$path <- path
 
+      return(parallel_results)
 
     }
 
-    #fit$iter <- parallel_output
-    fit$path <- parallel_output
+    #fit$iter <- parallel_output[[1]]$iterations
+    fit$iter <- parallel_output$iterations
+    #fit$sparsity <- parallel_output[[1]]$sparsity
+    #fit$path <- parallel_output[[1]]$path
 
     fit$elapse <-  proc.time()[3] - start
 
