@@ -52,8 +52,7 @@
 #' @examples Y <- data$Y
 #' @examples result <- estimation(X,Y)
 #'
-#' @import doParallel
-#' @import foreach
+#' @import doSNOW
 #' @import parallel
 #' @import progress
 

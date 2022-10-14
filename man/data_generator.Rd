@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_generator.R
 \name{data_generator}
 \alias{data_generator}
-\title{Data Generator}
+\title{Data Generating Function}
 \usage{
 data_generator(n, p, Delta = NULL, case = "sparse", seed = NULL)
 }
@@ -33,7 +33,15 @@ A list of various outputs, namely:
 }
 }
 \description{
-This functions generates two \eqn{n} by \eqn{p} size samples of multivariate normal
+This function generates two \eqn{n} by \eqn{p} samples of multivariate normal
+data by means of simulation. The two samples can be represented as follows:
+}
+\details{
+\deqn{X \sim N(\mu, \Sigma_1)}
+
+generates data
+
+functions generates two \eqn{n} by \eqn{p} size samples of multivariate normal
 data. In doing this it also determines and provides the relevant covariance
 matrices.
 }
