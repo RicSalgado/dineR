@@ -1,11 +1,15 @@
-# Data Generating Function
-
-# The first components of this function are if statement to ensure the
-# necessary dimensions are maintained.
-
-#' Data Generator
+#' Data Generating Function
 #'
-#' This functions generates two \eqn{n} by \eqn{p} size samples of multivariate normal
+#' This function generates two \eqn{n} by \eqn{p} samples of multivariate normal
+#' data by means of simulation. The two samples can be represented as follows:
+#'
+#' \deqn{X \sim N(\mu, \Sigma_1)}
+#'
+#'
+#' generates data
+#'
+#'
+#' functions generates two \eqn{n} by \eqn{p} size samples of multivariate normal
 #' data. In doing this it also determines and provides the relevant covariance
 #' matrices.
 #'
@@ -37,6 +41,8 @@
 #' @import MASS
 #' @importFrom "stats" "cor" "cov" "qnorm" "sd" "toeplitz"
 
+# The first components of this function are if statement to ensure the
+# necessary dimensions are maintained.
 data_generator <- function(n, p, Delta = NULL, case = "sparse", seed = NULL){
 
   if(n < 1){

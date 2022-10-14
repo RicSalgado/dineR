@@ -7,21 +7,34 @@
 
 [![R-CMD-check](https://github.com/RicSalgado/diner/workflows/R-CMD-check/badge.svg)](https://github.com/RicSalgado/diner/actions)
 [![CodeFactor](https://www.codefactor.io/repository/github/ricsalgado/diner/badge)](https://www.codefactor.io/repository/github/ricsalgado/diner)
+[![](https://github.com/RicSalgado/dineR/tree/master/man/figures/lifecycle-stable.svg)
 [![](https://coveralls.io/repos/github/google/benchmark/badge.svg?branch=master)](https://coveralls.io/github/google/benchmark)
 [![](http://cranlogs.r-pkg.org/badges/grand-total/dineR?color=blue)](https://cran.r-project.org/package=dineR)
 <!-- badges: end -->
 
-The goal of dineR is to enable users of all backgrounds to easily and computationally efficiently perform differential network estimation. 
+## Overview
+
+*dineR* is a R package, that aims to enable users of all backgrounds to easily, 
+and computationally efficiently perform differential network estimation. Data can 
+either be provided directly, or simulated. The differential network is then efficiently
+estimated through the use of a selected loss function and either sequential or 
+parallel optimization. 
 
 ## Installation
 
-You can install the released version of dineR from [CRAN](https://CRAN.R-project.org) with:
+You can install the latest release version of dineR from [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
 install.packages("dineR")
 ```
 
-## Example
+However, it is also possible to install the development version from [GitHub](https://github.com/RicSalgado/dineR) with: 
+
+``` r
+devtools::install_github("RicSalgado/dineR")
+```
+
+## Usage
 
 This is a basic example which shows you how to solve a common problem:
 
