@@ -5,11 +5,11 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/RicSalgado/diner/workflows/R-CMD-check/badge.svg)](https://github.com/RicSalgado/diner/actions)
-[![CodeFactor](https://www.codefactor.io/repository/github/ricsalgado/diner/badge)](https://www.codefactor.io/repository/github/ricsalgado/diner)
-[![Lifecycle](https://github.com/RicSalgado/dineR-dev/tree/dev/man/figures/lifecycle-stable.svg)
-[![](https://coveralls.io/repos/github/google/benchmark/badge.svg?branch=master)](https://coveralls.io/github/google/benchmark)
-[![](http://cranlogs.r-pkg.org/badges/grand-total/dineR?color=blue)](https://cran.r-project.org/package=dineR)
+[![R-CMD-check](https://github.com/RicSalgado/diner/workflows/R-CMD-check/badge.svg)](https://github.com/RicSalgado/diner/actions)]
+[![CodeFactor](https://www.codefactor.io/repository/github/ricsalgado/diner/badge)](https://www.codefactor.io/repository/github/ricsalgado/diner)]
+[![Lifecycle](https://github.com/RicSalgado/dineR-dev/tree/dev/man/figures/lifecycle-stable.svg)]
+[![](https://coveralls.io/repos/github/google/benchmark/badge.svg?branch=master)](https://coveralls.io/github/google/benchmark)]
+[![](http://cranlogs.r-pkg.org/badges/grand-total/dineR?color=blue)](https://cran.r-project.org/package=dineR)]
 <!-- badges: end -->
 
 ## Overview
