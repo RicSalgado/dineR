@@ -36,10 +36,15 @@ devtools::install_github("RicSalgado/dineR")
 
 ## Usage
 
-This is a basic example which shows you how to solve a common problem:
+A basic workflow of estimating a differential network using *dineR* is as follows:
 
 ``` r
+# Load dineR into the current R session
 library(dineR)
+```
+
+
+``` r
 # Data Generation
 n_X <- 100
 n_Y <- n_X
