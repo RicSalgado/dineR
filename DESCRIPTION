@@ -22,7 +22,6 @@ URL: https://github.com/RicSalgado/dineR
 BugReports: https://github.com/RicSalgado/dineR/issues
 Imports: 
     doSNOW,
-    lifecycle,
     MASS,
     parallel,
     progress
