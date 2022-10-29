@@ -688,7 +688,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
       pb$tick(tokens = list(lambda = progress_lambda[i]))
 
-      fit$path[[i]] <- Matrix::Matrix(Delta, sparse = T)
+      fit$path[[i]] <- Matrix::Matrix(Delta, sparse = TRUE, doDiag = FALSE)
       fit$sparsity[i] <- sum(Delta != 0) / p / (p-1)
 
     }
@@ -857,7 +857,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
       }
 
       sparsity[i] <- sum(Delta != 0) / p / (p-1)
-      path[[i]] <- Matrix::Matrix(Delta, sparse = T)
+      path[[i]] <- Matrix::Matrix(Delta, sparse = TRUE, doDiag = FALSE)
 
       return(list(iterations, sparsity, path))
 
