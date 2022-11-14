@@ -41,6 +41,8 @@
 #'
 #' @import MASS
 #' @importFrom "stats" "cor" "cov" "qnorm" "sd" "toeplitz"
+#'
+#' @references Tang, Z., Yu, Z. and Wang, C., 2020. A fast iterative algorithm for high-dimensional differential network. Computational Statistics, 35(1), pp.95-109.
 
 data_generator <- function(n_X = NULL, n_Y = NULL, p = NULL, Delta = NULL, case = "sparse", seed = NULL){
 

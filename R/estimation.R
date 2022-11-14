@@ -55,6 +55,8 @@
 #' @import doSNOW
 #' @import parallel
 #' @import progress
+#'
+#' @references Tang, Z., Yu, Z. and Wang, C., 2020. A fast iterative algorithm for high-dimensional differential network. Computational Statistics, 35(1), pp.95-109.
 
 estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 10, a = NULL,
                        loss = "lasso", tuning = "none", perturb = FALSE, stop_tol = 1e-5,

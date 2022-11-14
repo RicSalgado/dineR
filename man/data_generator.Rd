@@ -35,7 +35,7 @@ data_generator(
 A list of the various outputs, namely:
 \itemize{
 \item case - The case used.
-\item seed_option - The seed use for simulation.
+\item seed_option - The seed used for simulation.
 \item X - The first multivariate normal sample.
 \item Y - The second multivariate normal sample.
 \item n_X - The number of observations simulated for X.
@@ -60,4 +60,7 @@ number of features \eqn{p}.
 data <- data_generator(n_X = 100, p = 50, seed = 123)
 data <- data_generator(n_X = 10, p = 50, case = "asymsparse")
 
+}
+\references{
+Tang, Z., Yu, Z. and Wang, C., 2020. A fast iterative algorithm for high-dimensional differential network. Computational Statistics, 35(1), pp.95-109.
 }
