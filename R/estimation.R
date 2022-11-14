@@ -56,7 +56,12 @@
 #' @import parallel
 #' @import progress
 #'
+#' @references Boyd, S., Parikh, N., Chu, E., Peleato, B. and Eckstein, J., 2011. Distributed optimization and statistical learning via the alternating direction method of multipliers. Foundations and Trends® in Machine learning, 3(1), pp.1-122.
+#' @references Chen, J. and Chen, Z., 2008. Extended Bayesian information criteria for model selection with large model spaces. Biometrika, 95(3), pp.759-771.
+#' @references Friedman, J., Hastie, T. and Tibshirani, R., 2008. Sparse inverse covariance estimation with the graphical lasso. Biostatistics, 9(3), pp.432-441.
 #' @references Tang, Z., Yu, Z. and Wang, C., 2020. A fast iterative algorithm for high-dimensional differential network. Computational Statistics, 35(1), pp.95-109.
+#' @references Yuan, H., Xi, R., Chen, C. and Deng, M., 2017. Differential network analysis via lasso penalized D-trace loss. Biometrika, 104(4), pp.755-770.
+#' @references Zhang, T. and Zou, H., 2014. Sparse precision matrix estimation via lasso penalized D-trace loss. Biometrika, 101(1), pp.103-120.
 
 estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 10, a = NULL,
                        loss = "lasso", tuning = "none", perturb = FALSE, stop_tol = 1e-5,
