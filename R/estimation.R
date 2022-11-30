@@ -603,12 +603,12 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
   if(is.null(Delta_init)){
 
-    Delta <- matrix(0, p, p)
+    Delta_init <- matrix(0, p, p)
 
   }
   else if(is.matrix(Delta_init)){
 
-    Delta <- Delta_init
+    Delta_init <- Delta_init
   }
 
   n_iter <- length(lambdas)
@@ -638,7 +638,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
         out <- diffnet_lasso(fit$Sigma_X, fit$Sigma_Y, p,
                              Lambda, X, Y, n_X, n_Y,
                              epsilon_X, epsilon_Y,
-                             lip, stop_tol, max_iter, Delta) # All of the parameters, including the selected lambda are given to the ADMM function
+                             lip, stop_tol, max_iter, Delta_init) # All of the parameters, including the selected lambda are given to the ADMM function
 
         Delta <- matrix(out$Delta, ncol=p)
         fit$iter[i] <- out$iter
@@ -646,9 +646,9 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
       }
       if(loss[1] == "scad"){
         out <- diffnet_scad(fit$Sigma_X, fit$Sigma_Y, p,
-                            lambda, a, X, Y, n_X, n_Y, ## TO-DO: Why are we using lambda and not Lambda? What is the difference
+                            lambda, a, X, Y, n_X, n_Y,
                             epsilon_X, epsilon_Y,
-                            lip, stop_tol, max_iter, Delta)
+                            lip, stop_tol, max_iter, Delta_init)
 
         Delta <- matrix(out$Delta, ncol=p)
         fit$iter[i] <- out$iter
@@ -658,7 +658,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
         out <- diffnet_mcp(fit$Sigma_X, fit$Sigma_Y, p,
                            lambda, a, X, Y, n_X, n_Y,
                            epsilon_X, epsilon_Y,
-                           lip, stop_tol, max_iter, Delta)
+                           lip, stop_tol, max_iter, Delta_init)
 
         Delta <- matrix(out$Delta, ncol=p)
         fit$iter[i] <- out$iter
@@ -718,7 +718,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
       tuning_results <- selection(fit, gamma, tuning = tuning[1])
     }
 
-    rm(X, Y, Delta)
+    rm(X, Y, Delta_init)
     class(fit) <- "diffnet"
 
     output <- list()
@@ -808,7 +808,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
         out <- diffnet_lasso(fit$Sigma_X, fit$Sigma_Y, p,
                              Lambda, X, Y, n_X, n_Y,
                              epsilon_X, epsilon_Y,
-                             lip, stop_tol, max_iter, Delta) # All of the parameters, including the selected lambda are given to the ADMM function
+                             lip, stop_tol, max_iter, Delta_init) # All of the parameters, including the selected lambda are given to the ADMM function
 
         Delta <- matrix(out$Delta, ncol=p)
         iterations <- c(iterations, out$iter)
@@ -818,7 +818,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
         out <- diffnet_scad(fit$Sigma_X, fit$Sigma_Y, p,
                             lambda, a, X, Y, n_X, n_Y,
                             epsilon_X, epsilon_Y,
-                            lip, stop_tol, max_iter, Delta)
+                            lip, stop_tol, max_iter, Delta_init)
 
         Delta <- matrix(out$Delta, ncol=p)
         iterations <- c(iterations, out$iter)
@@ -828,7 +828,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
         out <- diffnet_mcp(fit$Sigma_X, fit$Sigma_Y, p,
                            lambda, a, X, Y, n_X, n_Y,
                            epsilon_X, epsilon_Y,
-                           lip, stop_tol, max_iter, Delta)
+                           lip, stop_tol, max_iter, Delta_init)
 
         Delta <- matrix(out$Delta, ncol=p)
         iterations <- c(iterations, out$iter)
@@ -895,7 +895,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
       tuning_results <- selection(fit, gamma, tuning = tuning[1])
     }
 
-    rm(X, Y, Delta)
+    rm(X, Y, Delta_init)
     class(fit) <- "diffnet"
 
     output <- list()
