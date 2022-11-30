@@ -168,7 +168,8 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
   }
 
   if(cores > nlambda){
-    warning(paste("The number of cores you have specified is larger than the number of lambdas. Thus, only", cores, "core(s) are being used."))
+    warning(paste("The number of cores you have specified is larger than the number of lambdas. Thus, only", nlambda, "core(s) are being used."))
+    cores <- nlambda
   }
 
   #################################################################
@@ -258,7 +259,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
     # We then perform the iterative procedure until convergence
 
-    while((err > stop_tol) & (iter < max_iter) || iter == 0 ){
+    while((err > stop_tol) & (iter < max_iter) || iter == 0){
 
       Delta_extra <- Delta + (t_old -  1) / t * (Delta - Delta_old)
       Delta_old <- Delta
@@ -645,7 +646,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
       }
       if(loss[1] == "scad"){
         out <- diffnet_scad(fit$Sigma_X, fit$Sigma_Y, p,
-                            lambda, a, X, Y, n_X, n_Y,
+                            lambda, a, X, Y, n_X, n_Y, ## TO-DO: Why are we using lambda and not Lambda? What is the difference
                             epsilon_X, epsilon_Y,
                             lip, stop_tol, max_iter, Delta)
 

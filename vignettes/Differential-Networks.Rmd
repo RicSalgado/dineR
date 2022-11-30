@@ -31,7 +31,7 @@ n_Y <- n_X
 # Number of features in sample 2
 p_Y <- p_X
 # Generate the data
-data <- data_generator(n = n_X, p = p_X, seed = 123)
+data <- data_generator(n_X = n_X, p = p_X, seed = 123)
 ```
 
 Now that the data has been generated, the data can be "wrangled" into the estimation function:
