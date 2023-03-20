@@ -15,19 +15,19 @@ knitr::opts_chunk$set(
 library(dineR)
 ```
 
-<small> _This Vignette covers the built-in Data Generating function in depth._ </small>
+<small> *This Vignette covers the built-in Data Generating function in depth.* </small>
 
 The focus of *dineR* lies primarily on differential networks, and the subsequent estimation thereof. However, the structure of data suitable for differential network estimation may not be immediately apparent. As such, this function provides users with an easy, scalable manner to generate appropriate data as they familiarize themselves with the estimation options available within *dineR*
 
 ## Getting Started
 
-The _data_generator_ function enables users to generate two multivariate normal samples of varying sizes, whose number of features/dimensions are equal. These two samples are representative of the two experimental conditions under which one would typically determine a differential network. 
+The *data_generator* function enables users to generate two multivariate normal samples of varying sizes, whose number of features/dimensions are equal. These two samples are representative of the two experimental conditions under which one would typically determine a differential network.
 
-Due to the technicalities of differential network estimation, it is not possible to validate the accuracy of estimates obtained through the use of traditional statistical methodologies. _data_generator_ aims to address this by generating data whose covariance matrices, and precision matrices are known a-priori and as such so too is the differential network. This allows users to validate the estimation procedure for their specific experimental criteria. 
+Due to the technicalities of differential network estimation, it is not possible to validate the accuracy of estimates obtained through the use of traditional statistical methodologies. *data_generator* aims to address this by generating data whose covariance matrices, and precision matrices are known a-priori and as such so too is the differential network. This allows users to validate the estimation procedure for their specific experimental criteria.
 
 ## Arguments
 
-The most important arguments available within _data_generator_ are as follows:
+The most important arguments available within *data_generator* are as follows:
 
 ```{r}
 # Number of observations in sample 1
@@ -48,7 +48,7 @@ seed <- 123
 
 ## Data Generation
 
-Having defined each of the key arguments above, the _data_generator_ function can now be called:
+Having defined each of the key arguments above, the *data_generator* function can now be called:
 
 ```{r}
 data <- data_generator(n_X = n_X, n_Y = n_Y, p = p, case = case, seed = seed)
@@ -56,7 +56,7 @@ data <- data_generator(n_X = n_X, n_Y = n_Y, p = p, case = case, seed = seed)
 
 ## Outputs
 
-Given the data has now been generated, the data can be "wrangled" for use within the estimation function. 
+Given the data has now been generated, the data can be "wrangled" for use within the estimation function.
 
 ```{r}
 # Extract the first sample
@@ -97,4 +97,4 @@ Lastly, it is possible to extract the differential network for comparison to the
 Delta <- data$Delta
 ```
 
-Having covered each of the key arguments and outputs available within _data_generator_, please kindly note that further details are available within the function documentation as well as the listed reference.
+Having covered each of the key arguments and outputs available within *data_generator*, please kindly note that further details are available within the function documentation as well as the listed reference.

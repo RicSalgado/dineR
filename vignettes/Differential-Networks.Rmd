@@ -58,7 +58,7 @@ We can now call the function to perform the estimation which makes use of altern
 ```{r}
 result <- estimation(X, Y, loss = loss, nlambda = nlambda, tuning = tuning)
 ```
-While the estimation process is busy, a progress bar should appear within the R Console showing the status of the optimization along with an estimated time remaining. The estimation then returns a great deal of items, and more if tuning is performed. For an overview on the items returned we can do the following:
+While the estimation process is busy, a progress bar should appear within the R Console showing the status of the optimization along with an estimated time remaining. The estimation then returns a great deal of items, with additional outputs available should tuning be performed. For an overview on the items returned we can do the following:
 
 ```{r}
 names(result)
