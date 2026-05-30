@@ -55,7 +55,7 @@ estimation(
 
 \item{gamma}{Optional parameter - Allows the user to adjust the EBIC value when EBIC is the selected tuning method. Defaults to 0.5.}
 
-\item{cores}{Optional parameter - Allows the user to specify the number of cores used by the optimization. Defaults to 1, i.e sequential solving however appropriate values range from 2 to the minimum of the number of lambdas and the number of available cores.}
+\item{cores}{Optional parameter - Allows the user to specify the number of cores used by the optimization. Defaults to 1, i.e sequential solving however appropriate values range from 2 to the minimum of the number of lambdas and the total number of available cores.}
 
 \item{verbose}{Optional parameter - Allows the user to obtain a summary of the estimation results. Options are TRUE or FALSE, where FALSE indicates the summary is not provided. Defaults to FALSE.}
 }
@@ -94,4 +94,17 @@ X <- data$X
 Y <- data$Y
 result <- estimation(X,Y)
 
+}
+\references{
+Boyd, S., Parikh, N., Chu, E., Peleato, B. and Eckstein, J., 2011. Distributed optimization and statistical learning via the alternating direction method of multipliers. Foundations and Trends® in Machine learning, 3(1), pp.1-122.
+
+Chen, J. and Chen, Z., 2008. Extended Bayesian information criteria for model selection with large model spaces. Biometrika, 95(3), pp.759-771.
+
+Friedman, J., Hastie, T. and Tibshirani, R., 2008. Sparse inverse covariance estimation with the graphical lasso. Biostatistics, 9(3), pp.432-441.
+
+Tang, Z., Yu, Z. and Wang, C., 2020. A fast iterative algorithm for high-dimensional differential network. Computational Statistics, 35(1), pp.95-109.
+
+Yuan, H., Xi, R., Chen, C. and Deng, M., 2017. Differential network analysis via lasso penalized D-trace loss. Biometrika, 104(4), pp.755-770.
+
+Zhang, T. and Zou, H., 2014. Sparse precision matrix estimation via lasso penalized D-trace loss. Biometrika, 101(1), pp.103-120.
 }

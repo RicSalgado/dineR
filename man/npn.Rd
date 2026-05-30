@@ -26,4 +26,12 @@ non paranormal data.
 data <- data_generator(n = 100, p = 50, seed = 123)
 X <- data$X
 X_transformed <- npn(X, npn_func = "truncation")
+
+}
+\references{
+Liu, H., Han, F., Yuan, M., Lafferty, J. and Wasserman, L., 2012. The nonparanormal skeptic. arXiv preprint arXiv:1206.6488.
+
+Liu, H., Lafferty, J. and Wasserman, L., 2009. The nonparanormal: Semiparametric estimation of high dimensional undirected graphs. Journal of Machine Learning Research, 10(10).
+
+Xue, L. and Zou, H., 2012. Regularized rank-based estimation of high-dimensional nonparanormal graphical models. The Annals of Statistics, 40(5), pp.2541-2571.
 }

@@ -2,42 +2,65 @@
 % Please edit documentation in R/data_generator.R
 \name{data_generator}
 \alias{data_generator}
-\title{Data Generator}
+\title{Data Generating Function}
 \usage{
-data_generator(n, p, Delta = NULL, case = "sparse", seed = NULL)
+data_generator(
+  n_X = NULL,
+  n_Y = NULL,
+  p = NULL,
+  Delta = NULL,
+  case = "sparse",
+  seed = NULL
+)
 }
 \arguments{
-\item{n}{The number of observations generated.}
+\item{n_X}{The number of observations to be generated for the first sample.}
 
-\item{p}{The number of dimensions for the generated samples.}
+\item{n_Y}{The number of observations to be generated for the second sample.
+\itemize{
+\item Only one of the above sample sizes need to be specified. In such a scenario, the sample size for the other sample is set to the same as the specified sample size.}}
 
-\item{Delta}{Optional parameter - Provides the differential network that will be used to obtain the sample covariance matrices.}
+\item{p}{The dimensions/features for the samples.}
 
-\item{case}{Optional parameter - Selects under which case the covariance matrices are determined. Possible cases are: "sparse" - Sparse Case or "asymsparse"- Asymptotically Sparse Case. Defaults to "sparse".}
+\item{Delta}{Optional parameter - Provides the differential network from which the sample covariance matrices must be derived.}
+
+\item{case}{Optional parameter - Allows for the specification of the precision matrix structure. Possible cases are: "sparse" - Sparse Case or "asymsparse"- Asymptotically Sparse Case. Defaults to "sparse".
+\itemize{
+\item Sparse Case: \eqn{\Omega_1 = (0.5^{|i-j|})^{-1}}. That is, \eqn{\{\Omega_1\}_{1,1} = \{\Omega_1\}_{p,p} = \frac{4}{3}, \{\Omega_1\}_{i,i} = \frac{5}{3}} for all other \eqn{i}. \eqn{\{\Omega_1\}_{i, {i + 1}} = \{\Omega_1\}_{{i-1},i} = \frac{2}{3}} and \eqn{\{\Omega_1\}_{i, j} = 0} for all other \eqn{i, j}.
+\item Asymptotically Sparse Case}}
 
 \item{seed}{Optional parameter - Allows a seed to be set for reproducibility.}
 }
 \value{
-A list of various outputs, namely:
+A list of the various outputs, namely:
 \itemize{
 \item case - The case used.
-\item seed_option - The seed provided.
+\item seed_option - The seed used for simulation.
 \item X - The first multivariate normal sample.
 \item Y - The second multivariate normal sample.
-\item Sigma_X - The covariance matrix of X.
-\item Sigma_Y - The covariance matrix of Y.
-\item Omega_X - The precision matrix of X.
-\item Omega_Y - The precision matrix of Y.
-\item diff_Omega - The difference of precision matrices.
-\item Delta - The target differential network.
+\item n_X - The number of observations simulated for X.
+\item n_Y - The number of observations simulated for Y.
+\item Sigma_X - The covariance matrix of X: \eqn{\Sigma_X}.
+\item Sigma_Y - The covariance matrix of Y: \eqn{\Sigma_Y}.
+\item Omega_X - The precision matrix of X: \eqn{\Sigma_X^{-1} = \Omega_X}.
+\item Omega_Y - The precision matrix of Y: \eqn{\Sigma_Y^{-1} = \Omega_Y}.
+\item Diff_Omega - The difference of the precision matrices: \eqn{\Omega_X - \Omega_Y}.
+\item Delta - The target differential network: \eqn{\Delta}.
 }
 }
 \description{
-This functions generates two \eqn{n} by \eqn{p} size samples of multivariate normal
-data. In doing this it also determines and provides the relevant covariance
-matrices.
+This function generates two multivariate normal samples, by means of simulation.
+The samples can be represented as follows:
+\deqn{X \sim N_p(0, \Sigma_1)}
+\deqn{Y \sim N_p(0, \Sigma_2)}
+with the only restriction being that each sample has the same
+number of features \eqn{p}.
 }
 \examples{
-data <- data_generator(n = 100, p = 50, seed = 123)
-data <- data_generator(n = 10, p = 50, case = "asymsparse")
+data <- data_generator(n_X = 100, p = 50, seed = 123)
+data <- data_generator(n_X = 10, p = 50, case = "asymsparse")
+
+}
+\references{
+Tang, Z., Yu, Z. and Wang, C., 2020. A fast iterative algorithm for high-dimensional differential network. Computational Statistics, 35(1), pp.95-109.
 }

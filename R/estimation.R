@@ -52,10 +52,16 @@
 #' @examples Y <- data$Y
 #' @examples result <- estimation(X,Y)
 #'
-#' @import doParallel
-#' @import foreach
+#' @import doSNOW
 #' @import parallel
 #' @import progress
+#'
+#' @references Boyd, S., Parikh, N., Chu, E., Peleato, B. and Eckstein, J., 2011. Distributed optimization and statistical learning via the alternating direction method of multipliers. Foundations and Trends® in Machine learning, 3(1), pp.1-122.
+#' @references Chen, J. and Chen, Z., 2008. Extended Bayesian information criteria for model selection with large model spaces. Biometrika, 95(3), pp.759-771.
+#' @references Friedman, J., Hastie, T. and Tibshirani, R., 2008. Sparse inverse covariance estimation with the graphical lasso. Biostatistics, 9(3), pp.432-441.
+#' @references Tang, Z., Yu, Z. and Wang, C., 2020. A fast iterative algorithm for high-dimensional differential network. Computational Statistics, 35(1), pp.95-109.
+#' @references Yuan, H., Xi, R., Chen, C. and Deng, M., 2017. Differential network analysis via lasso penalized D-trace loss. Biometrika, 104(4), pp.755-770.
+#' @references Zhang, T. and Zou, H., 2014. Sparse precision matrix estimation via lasso penalized D-trace loss. Biometrika, 101(1), pp.103-120.
 
 estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 10, a = NULL,
                        loss = "lasso", tuning = "none", perturb = FALSE, stop_tol = 1e-5,
@@ -162,7 +168,8 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
   }
 
   if(cores > nlambda){
-    warning(paste("The number of cores you have specified is larger than the number of lambdas. Thus, only", cores, "core(s) are being used."))
+    warning(paste("The number of cores you have specified is larger than the number of lambdas. Thus, only", nlambda, "core(s) are being used."))
+    cores <- nlambda
   }
 
   #################################################################
@@ -252,7 +259,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
     # We then perform the iterative procedure until convergence
 
-    while((err > stop_tol) & (iter < max_iter) || iter == 0 ){
+    while((err > stop_tol) & (iter < max_iter) || iter == 0){
 
       Delta_extra <- Delta + (t_old -  1) / t * (Delta - Delta_old)
       Delta_old <- Delta
@@ -596,12 +603,12 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
   if(is.null(Delta_init)){
 
-    Delta <- matrix(0, p, p)
+    Delta_init <- matrix(0, p, p)
 
   }
   else if(is.matrix(Delta_init)){
 
-    Delta <- Delta_init
+    Delta_init <- Delta_init
   }
 
   n_iter <- length(lambdas)
@@ -631,7 +638,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
         out <- diffnet_lasso(fit$Sigma_X, fit$Sigma_Y, p,
                              Lambda, X, Y, n_X, n_Y,
                              epsilon_X, epsilon_Y,
-                             lip, stop_tol, max_iter, Delta) # All of the parameters, including the selected lambda are given to the ADMM function
+                             lip, stop_tol, max_iter, Delta_init) # All of the parameters, including the selected lambda are given to the ADMM function
 
         Delta <- matrix(out$Delta, ncol=p)
         fit$iter[i] <- out$iter
@@ -641,7 +648,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
         out <- diffnet_scad(fit$Sigma_X, fit$Sigma_Y, p,
                             lambda, a, X, Y, n_X, n_Y,
                             epsilon_X, epsilon_Y,
-                            lip, stop_tol, max_iter, Delta)
+                            lip, stop_tol, max_iter, Delta_init)
 
         Delta <- matrix(out$Delta, ncol=p)
         fit$iter[i] <- out$iter
@@ -651,7 +658,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
         out <- diffnet_mcp(fit$Sigma_X, fit$Sigma_Y, p,
                            lambda, a, X, Y, n_X, n_Y,
                            epsilon_X, epsilon_Y,
-                           lip, stop_tol, max_iter, Delta)
+                           lip, stop_tol, max_iter, Delta_init)
 
         Delta <- matrix(out$Delta, ncol=p)
         fit$iter[i] <- out$iter
@@ -689,7 +696,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
       pb$tick(tokens = list(lambda = progress_lambda[i]))
 
-      fit$path[[i]] <- Matrix::Matrix(Delta, sparse = T)
+      fit$path[[i]] <- Matrix::Matrix(Delta, sparse = TRUE, doDiag = FALSE)
       fit$sparsity[i] <- sum(Delta != 0) / p / (p-1)
 
     }
@@ -711,7 +718,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
       tuning_results <- selection(fit, gamma, tuning = tuning[1])
     }
 
-    rm(X, Y, Delta)
+    rm(X, Y, Delta_init)
     class(fit) <- "diffnet"
 
     output <- list()
@@ -801,7 +808,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
         out <- diffnet_lasso(fit$Sigma_X, fit$Sigma_Y, p,
                              Lambda, X, Y, n_X, n_Y,
                              epsilon_X, epsilon_Y,
-                             lip, stop_tol, max_iter, Delta) # All of the parameters, including the selected lambda are given to the ADMM function
+                             lip, stop_tol, max_iter, Delta_init) # All of the parameters, including the selected lambda are given to the ADMM function
 
         Delta <- matrix(out$Delta, ncol=p)
         iterations <- c(iterations, out$iter)
@@ -811,7 +818,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
         out <- diffnet_scad(fit$Sigma_X, fit$Sigma_Y, p,
                             lambda, a, X, Y, n_X, n_Y,
                             epsilon_X, epsilon_Y,
-                            lip, stop_tol, max_iter, Delta)
+                            lip, stop_tol, max_iter, Delta_init)
 
         Delta <- matrix(out$Delta, ncol=p)
         iterations <- c(iterations, out$iter)
@@ -821,7 +828,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
         out <- diffnet_mcp(fit$Sigma_X, fit$Sigma_Y, p,
                            lambda, a, X, Y, n_X, n_Y,
                            epsilon_X, epsilon_Y,
-                           lip, stop_tol, max_iter, Delta)
+                           lip, stop_tol, max_iter, Delta_init)
 
         Delta <- matrix(out$Delta, ncol=p)
         iterations <- c(iterations, out$iter)
@@ -858,7 +865,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
       }
 
       sparsity[i] <- sum(Delta != 0) / p / (p-1)
-      path[[i]] <- Matrix::Matrix(Delta, sparse = T)
+      path[[i]] <- Matrix::Matrix(Delta, sparse = TRUE, doDiag = FALSE)
 
       return(list(iterations, sparsity, path))
 
@@ -888,7 +895,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
       tuning_results <- selection(fit, gamma, tuning = tuning[1])
     }
 
-    rm(X, Y, Delta)
+    rm(X, Y, Delta_init)
     class(fit) <- "diffnet"
 
     output <- list()
