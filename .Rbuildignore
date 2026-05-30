@@ -7,3 +7,4 @@
 ^docs
 ^raw
 ^CODE_OF_CONDUCT\.md$
+^_pkgdown\.yml$
