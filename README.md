@@ -1,14 +1,14 @@
 # dineR
 
-<img src="https://raw.githubusercontent.com/RicSalgado/dineR/master/raw/sticker/dineR.png" width="150" height="150" align="right"/>
+<img src="https://raw.githubusercontent.com/RicSalgado/dineR/master/raw/sticker/dineR.png" alt="dineR logo" width="150" height="150" align="right"/>
 
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/RicSalgado/diner/workflows/R-CMD-check/badge.svg)](https://github.com/RicSalgado/diner/actions)
 [![CodeFactor](https://www.codefactor.io/repository/github/ricsalgado/diner/badge)](https://www.codefactor.io/repository/github/ricsalgado/diner)
 [![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)
-[![](https://coveralls.io/repos/github/google/benchmark/badge.svg?branch=master)](https://coveralls.io/github/google/benchmark)
-[![](http://cranlogs.r-pkg.org/badges/grand-total/dineR?color=blue)](https://cran.r-project.org/package=dineR)
+[![Coveralls coverage](https://coveralls.io/repos/github/google/benchmark/badge.svg?branch=master)](https://coveralls.io/github/google/benchmark)
+[![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/dineR?color=blue)](https://cran.r-project.org/package=dineR)
 
 <!-- badges: end -->
 

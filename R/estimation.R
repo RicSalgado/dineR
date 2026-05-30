@@ -986,7 +986,7 @@ summary.estimation <- function(object, ...){
     cat(paste0(separator))
 
     tab <- matrix(c(x$tuning, x$ic_index, x$ic_value, x$chosen_lambda_ic), ncol=1, byrow=TRUE)
-    colnames(tab) <- c('Optimal Information Criteria')
+    colnames(tab) <- 'Optimal Information Criteria'
     rownames(tab) <- c('Selected Information Criterion','Lambda Index','Information Criteria Value', 'Lambda Value')
     tab <- as.table(tab)
 
@@ -996,7 +996,7 @@ summary.estimation <- function(object, ...){
     cat("\n")
 
     tab <- matrix(c(x$loss, x$loss_index, x$loss_value, x$chosen_lambda_loss), ncol=1, byrow=TRUE)
-    colnames(tab) <- c('Minimum Loss Value')
+    colnames(tab) <- 'Minimum Loss Value'
     rownames(tab) <- c('Selected Loss Function','Lambda Index','Loss Function Value', 'Lambda Value')
     tab <- as.table(tab)
 
