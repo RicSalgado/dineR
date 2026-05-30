@@ -77,8 +77,8 @@ data_generator <- function(n_X = NULL, n_Y = NULL, p = NULL, Delta = NULL, case 
   # Differential Network
 
   if(is.null(Delta)){
-    Delta <- matrix(0,p,p)
-    Delta[1:2,1:2] <- matrix(c(0, -1, -1, 2), 2) #T his is the matrix used by Tang et al.
+    Delta <- matrix(0, p, p)
+    Delta[1:2, 1:2] <- matrix(c(0, -1, -1, 2), 2) # This is the matrix used by Tang et al.
   }else if(nrow(Delta) != ncol(Delta)){
     warning("The provided differential network is not square.")
     return(NULL)
@@ -171,6 +171,6 @@ data_generator <- function(n_X = NULL, n_Y = NULL, p = NULL, Delta = NULL, case 
   results$Diff_Omega <- Diff_Omega
   results$Delta <- Delta
 
-  return(results)
+  results
 
 }

@@ -69,7 +69,7 @@ npn <- function(x, npn_func = "shrinkage", npn_thresh = NULL, verbose = TRUE){
       message("Nonparanormal transformation via skeptic.\n")
 
     }
-    x <- 2*sin(pi / 6*cor(x, method="spearman"))
+    x <- 2 * sin(pi / 6 * cor(x, method = "spearman"))
 
     rm(n, d, verbose)
 
@@ -77,5 +77,5 @@ npn <- function(x, npn_func = "shrinkage", npn_thresh = NULL, verbose = TRUE){
     rownames(x) <- x_col
   }
 
-  return(x)
+  x
 }

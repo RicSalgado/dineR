@@ -32,13 +32,13 @@ selection <- function(output, gamma , Sigma_X = NULL, Sigma_Y = NULL, tuning = c
 
   class(output) <- "diffnet"
   rm(n_X, n_Y)
-  return(output)
+  output
 }
 
 diffnet_ic <- function(Sigma_X, Sigma_Y, path, type_of_loss, n, penalty){
 
-  lowtri <- which(lower.tri(path[[1]], diag=TRUE))
-  df <- sapply(path, function(x){ sum(x[lowtri]!=0); })
+  lowtri <- which(lower.tri(path[[1]], diag = TRUE))
+  df <- sapply(path, function(x) { sum(x[lowtri] != 0) })
 
   if(type_of_loss != "d-trace"){
 
@@ -63,20 +63,20 @@ diffnet_ic <- function(Sigma_X, Sigma_Y, path, type_of_loss, n, penalty){
   optimal <- list()
   optimal$opt <- opt
   optimal$ic <- ic
-  return(optimal)
+  optimal
 
 }
 
 lossFunction <- function(Delta, Sigma_X, Sigma_Y){
 
   err <- Sigma_X%*%Delta%*%Sigma_Y - Sigma_X + Sigma_Y
-  return(c(max(abs(err)), sqrt(sum(err^2)))) # Max & Frobenius norms
+  c(max(abs(err)), sqrt(sum(err^2))) # Max & Frobenius norms
 
 }
 
 lossFunctionDtrace <- function(Delta, Sigma_X, Sigma_Y){
 
   err <- (Sigma_X%*%Delta%*%Sigma_Y + Sigma_Y%*%Delta%*%Sigma_X) / 2 - Sigma_X + Sigma_Y
-  return(c(max(abs(err)), sqrt(sum(err^2)))) # Max & Frobenius norms
+  c(max(abs(err)), sqrt(sum(err^2))) # Max & Frobenius norms
 
 }

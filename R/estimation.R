@@ -77,7 +77,7 @@
 
 estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 10, a = NULL,
                        loss = "lasso", tuning = "none", perturb = FALSE, stop_tol = 1e-5,
-                       max_iter = 500, correlation = FALSE, Delta_init = NULL, rho=NULL, gamma=NULL,
+                       max_iter = 500, correlation = FALSE, Delta_init = NULL, rho = NULL, gamma = NULL,
                        cores = 1, verbose = FALSE){
 
   # WARNING MESSAGES
@@ -135,7 +135,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
   }
 
-  perturb_options <- c(F, FALSE, T, TRUE)
+  perturb_options <- c(TRUE, FALSE)
 
   if(!is.element(perturb, perturb_options)){
     warning("Please select either TRUE or FALSE for whether to perturb.")
@@ -152,7 +152,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
     return(NULL)
   }
 
-  correlation_options <- c(F, FALSE, T, TRUE)
+  correlation_options <- c(TRUE, FALSE)
 
   if(!is.element(correlation, correlation_options)){
     warning("Please select either TRUE or FALSE for whether to use the correlation matrices.")
@@ -192,7 +192,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
     Y <- X
     Y <- (Y > Lambda)*(Y - Lambda) + (Y < (-Lambda)) * (Y + Lambda)
-    return(Y)
+    Y
 
   }
 
@@ -201,7 +201,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
   small_p_loss_func <- function(Sigma_X, Sigma_Y, diff_Sigma, Delta){
 
     lf <- 0.5*sum(sum(Delta %*% (Sigma_X%*%Delta%*%Sigma_Y))) - sum(sum(Delta %*% diff_Sigma))
-    return(lf)
+    lf
 
   }
 
@@ -215,7 +215,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
     }
 
     lf <- 0.5*sum(sum(Delta * t(X)%*%(X%*%Delta%*%t(Y)%*%Y))) - sum(sum(Delta * diff_Sigma))
-    return(lf)
+    lf
 
   }
 
@@ -224,7 +224,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
   penalty_func <- function(Delta, Lambda){
 
     pl <- sum(sum(abs(Lambda * Delta)))
-    return(pl)
+    pl
 
   }
 
@@ -329,14 +329,14 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
     output$iter <- iter
     output$Delta <- Delta
 
-    return(output)
+    output
 
   }
 
   compute_mcp_lambda <- function(Delta, lambda, a){
 
     weighted_lambda <- (Delta <= a*lambda) * (lambda - Delta/a)
-    return(weighted_lambda)
+    weighted_lambda
   }
 
   diffnet_mcp <- function(pSigma_X, pSigma_Y, p,
@@ -351,11 +351,9 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
     weighted_lambda <- compute_mcp_lambda(Delta, lambda, a)
 
-    output <- diffnet_lasso(pSigma_X, pSigma_Y, p, weighted_lambda, pX, pY, n_X, n_Y,
-                            epsilon_X, epsilon_Y,
-                            lip, stop_tol, max_iter, pDelta)
-
-    return(output)
+    diffnet_lasso(pSigma_X, pSigma_Y, p, weighted_lambda, pX, pY, n_X, n_Y,
+                  epsilon_X, epsilon_Y,
+                  lip, stop_tol, max_iter, pDelta)
 
   }
 
@@ -364,7 +362,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
   compute_scad_lambda <- function(Delta, lambda, a){
 
     weighted_lambda <- lambda * ((Delta <= lambda) + (Delta > lambda) * (pmax(pmin(a*lambda - Delta, 0), BIG) / (a-1) / lambda))
-    return(weighted_lambda)
+    weighted_lambda
   }
 
   diffnet_scad <- function(pSigma_X, pSigma_Y, p,
@@ -378,18 +376,16 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
     weighted_lambda <- compute_scad_lambda(abs(Delta), lambda, a)
 
-    output <- diffnet_lasso(pSigma_X, pSigma_Y, p, weighted_lambda, pX, pY, n_X, n_Y,
-                            epsilon_X, epsilon_Y,
-                            lip, stop_tol, max_iter, pDelta)
-
-    return(output)
+    diffnet_lasso(pSigma_X, pSigma_Y, p, weighted_lambda, pX, pY, n_X, n_Y,
+                  epsilon_X, epsilon_Y,
+                  lip, stop_tol, max_iter, pDelta)
 
   }
 
   loss_func <- function(Sigma_X, Sigma_Y, diff_Sigma, Delta){
 
     lf <- 0.25*sum(sum(Delta * (Sigma_X%*%Delta%*%Sigma_Y))) + 0.25*sum(sum(Delta * (Sigma_Y%*%Delta%*%Sigma_X))) - sum(sum(Delta * diff_Sigma))
-    return(lf)
+    lf
 
   }
 
@@ -411,7 +407,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
     A <- matrix(NA, p, p)
     B <- matrix(NA, p, p)
-    C <- matrix(NA, p ,p)
+    C <- matrix(NA, p, p)
 
     Delta1 <- as.matrix(pDelta0, p, p)
     Delta2 <- as.matrix(pDelta0, p, p)
@@ -481,7 +477,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
                      stop.tol = stop.tol, max.iter = 1e3){
 
     if(is.null(Delta0)) Delta0 <- solve(SigmaY+diag(nrow(SigmaY)))-solve(SigmaX+diag(nrow(SigmaX)))
-    if(is.null(Lambda0)) Lambda0 <- matrix(1,nrow(SigmaX),ncol(SigmaX))
+    if(is.null(Lambda0)) Lambda0 <- matrix(1, nrow(SigmaX), ncol(SigmaX))
 
     p <- dim(Delta0)[1]
     k <- 0
@@ -492,8 +488,8 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
       Dx <- M1$values
       Uy <- M2$vectors
       Dy <- M2$values
-      C1 <- matrix(0,p,p)
-      C2 <- matrix(0,p,p)
+      C1 <- matrix(0, p, p)
+      C2 <- matrix(0, p, p)
 
       for (i in 1:p){
         for (j in 1:p){
@@ -516,7 +512,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
                            SigmaY, rho, C1, C2,
                            Ux, Uy, stop.tol, p, lambda, max.iter)
 
-    Lambda3 <- matrix(admm$Lambda3, p ,p)
+    Lambda3 <- matrix(admm$Lambda3, p, p)
     Delta3 <- matrix(admm$Delta3, nrow=p, ncol=p)
     iter <- admm$iter
 
@@ -525,7 +521,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
     result$Lambda3 <- Lambda3
     result$iter <- iter
 
-    return(result)
+    result
   }
 
   #################################################################
@@ -549,21 +545,21 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
     fit$Sigma_X <- cor(X)
     fit$Sigma_Y <- cor(Y)
 
-    X <- scale(X, center = T, scale = T) / sqrt(n_X-1)
-    Y <- scale(Y, center = T, scale = T) / sqrt(n_Y-1)
+    X <- scale(X, center = TRUE, scale = TRUE) / sqrt(n_X - 1)
+    Y <- scale(Y, center = TRUE, scale = TRUE) / sqrt(n_Y - 1)
   }else{ # This standardizes the data if we are not using the correlation matrices so scale does not affect the network
-    fit$Sigma_X <- cov(X)*(1 - 1/n_X)
-    fit$Sigma_Y <- cov(Y)*(1 - 1/n_Y)
+    fit$Sigma_X <- cov(X) * (1 - 1/n_X)
+    fit$Sigma_Y <- cov(Y) * (1 - 1/n_Y)
 
-    X <- scale(X, center = T, scale = F) / sqrt(n_X)
-    Y <- scale(Y, center = T, scale = F) / sqrt(n_Y)
+    X <- scale(X, center = TRUE, scale = FALSE) / sqrt(n_X)
+    Y <- scale(Y, center = TRUE, scale = FALSE) / sqrt(n_Y)
   }
 
   # This is the same perturbation as CLIME which was shown to improve performance for single precision matrices
 
   if(perturb){
-    eigvals_X <- eigen(fit$Sigma_X, only.values=TRUE)$values
-    eigvals_Y <- eigen(fit$Sigma_Y, only.values=TRUE)$values
+    eigvals_X <- eigen(fit$Sigma_X, only.values = TRUE)$values
+    eigvals_Y <- eigen(fit$Sigma_Y, only.values = TRUE)$values
 
     epsilon_X <- max(max(eigvals_X) - p*min(eigvals_X), 0) / (p-1)
     epsilon_Y <- max(max(eigvals_Y) - p*min(eigvals_Y), 0) / (p-1)
@@ -576,7 +572,8 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
   }
 
   # Calculate the lipschitz constant
-  lip <- eigen(fit$Sigma_X, symmetric = T, only.values = T)$value[1]*eigen(fit$Sigma_Y, symmetric = T, only.values = T)$value[1]
+  lip <- eigen(fit$Sigma_X, symmetric = TRUE, only.values = TRUE)$values[1] *
+    eigen(fit$Sigma_Y, symmetric = TRUE, only.values = TRUE)$values[1]
 
   width <- getOption("width")
   separator <- strrep("-", width)
@@ -597,7 +594,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
     lambdas <- exp(seq(log(lambda_max), log(lambda_min), length = nlambda))
   }
 
-  lambdas <- sort(lambdas, decreasing = T)
+  lambdas <- sort(lambdas, decreasing = TRUE)
   fit$lambdas <- lambdas
 
   if(is.null(a)) {
@@ -614,13 +611,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
   # The initial guess of Delta is given, is used otherwise a zero matrix is used
 
   if(is.null(Delta_init)){
-
     Delta_init <- matrix(0, p, p)
-
-  }
-  else if(is.matrix(Delta_init)){
-
-    Delta_init <- Delta_init
   }
 
   n_iter <- length(lambdas)
@@ -630,7 +621,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
                          clear = FALSE,
                          width = 100)
 
-  progress_lambda <- seq(1:n_iter)
+  progress_lambda <- seq_len(n_iter)
 
   #################################################################
 
@@ -639,7 +630,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
   if(cores == 1){
 
     start <- proc.time()[3]
-    for(i in 1:length(lambdas)){
+    for(i in seq_along(lambdas)){
 
       lambda <- lambdas[i] # Extract our chosen lambda
 
@@ -686,8 +677,8 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
         Dx <- M1$values
         Uy <- M2$vectors
         Dy <- M2$values
-        C1 <- matrix(0,p,p)
-        C2 <- matrix(0,p,p)
+        C1 <- matrix(0, p, p)
+        C2 <- matrix(0, p, p)
 
         for (k in 1:p){
           for (j in 1:p){
@@ -776,20 +767,18 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
     }
 
-    return(output)
+    output
 
-  }
+  } else {
 
-  #######################################################
+    #######################################################
 
-  # PARALLEL OPTIMIZATION
+    # PARALLEL OPTIMIZATION
 
-  comb <- function(x, ...) {
-    lapply(seq_along(x),
-           function(i) c(x[[i]], lapply(list(...), function(y) y[[i]])))
-  }
-
-  if(cores != 1){
+    comb <- function(x, ...) {
+      lapply(seq_along(x),
+             function(i) c(x[[i]], lapply(list(...), function(y) y[[i]])))
+    }
 
     cluster <- makeCluster(cores)
     registerDoSNOW(cluster)
@@ -802,14 +791,14 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
     start <- proc.time()[3]
 
-    parallel_output <- foreach(i = 1:length(lambdas), .combine = 'comb',
+    parallel_output <- foreach(i = seq_along(lambdas), .combine = 'comb',
                                .multicombine = TRUE,
                                .init = list(list(), list(), list()),
                                .options.snow = opts) %dopar% {
 
-      iterations <- c()
-      sparsity <- c()
-      path <- c()
+      iterations <- NULL
+      sparsity <- NULL
+      path <- list()
 
       lambda <- lambdas[i] # Extract our chosen lambda
 
@@ -856,8 +845,8 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
         Dx <- M1$values
         Uy <- M2$vectors
         Dy <- M2$values
-        C1 <- matrix(0,p,p)
-        C2 <- matrix(0,p,p)
+        C1 <- matrix(0, p, p)
+        C2 <- matrix(0, p, p)
 
         for (k in 1:p){
           for (j in 1:p){
@@ -879,7 +868,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
       sparsity[i] <- sum(Delta != 0) / p / (p-1)
       path[[i]] <- Matrix::Matrix(Delta, sparse = TRUE, doDiag = FALSE)
 
-      return(list(iterations, sparsity, path))
+      list(iterations, sparsity, path)
 
     }
 
@@ -954,7 +943,7 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
     }
 
     stopCluster(cluster)
-    return(output)
+    output
 
   }
 
