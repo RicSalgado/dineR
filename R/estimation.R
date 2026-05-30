@@ -47,14 +47,26 @@
 #'
 #' @export
 #'
-#' @examples data <- data_generator(n = 100, p = 50, seed = 123)
-#' @examples X <- data$X
-#' @examples Y <- data$Y
-#' @examples result <- estimation(X,Y)
+#' @examples
+#' data <- data_generator(n_X = 100, p = 50, seed = 123)
+#' X <- data$X
+#' Y <- data$Y
+#'
+#' # Sequential (default)
+#' result_seq <- estimation(X, Y, nlambda = 5, cores = 1)
+#' result_seq$elapse
+#'
+#' \donttest{
+#' # Parallel - set cores to a value greater than 1
+#' # (detectCores() - 1 is recommended on your own machine)
+#' result_par <- estimation(X, Y, nlambda = 5, cores = 2)
+#' result_par$elapse
+#' }
 #'
 #' @import doSNOW
 #' @import parallel
 #' @import progress
+#' @importFrom foreach foreach %dopar%
 #'
 #' @references Boyd, S., Parikh, N., Chu, E., Peleato, B. and Eckstein, J., 2011. Distributed optimization and statistical learning via the alternating direction method of multipliers. Foundations and Trends® in Machine learning, 3(1), pp.1-122.
 #' @references Chen, J. and Chen, Z., 2008. Extended Bayesian information criteria for model selection with large model spaces. Biometrika, 95(3), pp.759-771.
@@ -948,7 +960,9 @@ estimation <- function(X, Y, lambdas = NULL, lambda_min_ratio = 0.3, nlambda = 1
 
 }
 
-summary.estimation <- function(x){
+#' @exportS3Method
+summary.estimation <- function(object, ...){
+  x <- object
 
   width <- getOption("width")
   separator <- strrep("-", width)

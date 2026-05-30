@@ -89,10 +89,20 @@ for a variety of loss functions to estimate the differential network given
 two samples of multivariate normal data.
 }
 \examples{
-data <- data_generator(n = 100, p = 50, seed = 123)
+data <- data_generator(n_X = 100, p = 50, seed = 123)
 X <- data$X
 Y <- data$Y
-result <- estimation(X,Y)
+
+# Sequential (default)
+result_seq <- estimation(X, Y, nlambda = 5, cores = 1)
+result_seq$elapse
+
+\donttest{
+# Parallel - set cores to a value greater than 1
+# (detectCores() - 1 is recommended on your own machine)
+result_par <- estimation(X, Y, nlambda = 5, cores = 2)
+result_par$elapse
+}
 
 }
 \references{

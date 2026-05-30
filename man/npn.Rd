@@ -23,7 +23,7 @@ This functions allows us to transform non-normal multivariate data to that of
 non paranormal data.
 }
 \examples{
-data <- data_generator(n = 100, p = 50, seed = 123)
+data <- data_generator(n_X = 100, p = 50, seed = 123)
 X <- data$X
 X_transformed <- npn(X, npn_func = "truncation")
 

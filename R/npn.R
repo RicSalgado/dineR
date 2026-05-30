@@ -11,7 +11,7 @@
 #' @return Returns the transformed data matrix.
 #' @export
 #'
-#' @examples data <- data_generator(n = 100, p = 50, seed = 123)
+#' @examples data <- data_generator(n_X = 100, p = 50, seed = 123)
 #' @examples X <- data$X
 #' @examples X_transformed <- npn(X, npn_func = "truncation")
 #'
