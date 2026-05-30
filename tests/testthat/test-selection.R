@@ -1,9 +1,11 @@
 library(testthat)
 test_that("selection behaves as expected", {
 
+  library(doParallel)
+  library(foreach)
   library(MASS)
+  library(parallel)
   library(progress)
-  library(Matrix)
 
   n_X <- 100
   n_Y <- n_X
@@ -11,7 +13,7 @@ test_that("selection behaves as expected", {
   p_Y <- p_X
   case <- "sparse"
 
-  data <- data_generator(n = n_X, p = p_X, seed = 123)
+  data <- data_generator(n_X = n_X, p = p_X, seed = 123)
 
   X <- data$X
   Y <- data$Y

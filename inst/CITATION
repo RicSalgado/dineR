@@ -1,0 +1,8 @@
+bibentry(
+  bibtype     = "Manual",
+  title       = "dineR: Differential Network Estimation in R",
+  author      = person("Ricardo Daniel", "Marques Salgado"),
+  year        = "2026",
+  url         = "https://github.com/RicSalgado/dineR",
+  textVersion = "R. D. Marques Salgado. dineR: Differential Network Estimation in R, 2026."
+)

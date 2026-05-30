@@ -11,9 +11,13 @@
 #' @return Returns the transformed data matrix.
 #' @export
 #'
-#' @examples data <- data_generator(n = 100, p = 50, seed = 123)
+#' @examples data <- data_generator(n_X = 100, p = 50, seed = 123)
 #' @examples X <- data$X
 #' @examples X_transformed <- npn(X, npn_func = "truncation")
+#'
+#' @references Liu, H., Han, F., Yuan, M., Lafferty, J. and Wasserman, L., 2012. The nonparanormal skeptic. arXiv preprint arXiv:1206.6488.
+#' @references Liu, H., Lafferty, J. and Wasserman, L., 2009. The nonparanormal: Semiparametric estimation of high dimensional undirected graphs. Journal of Machine Learning Research, 10(10).
+#' @references Xue, L. and Zou, H., 2012. Regularized rank-based estimation of high-dimensional nonparanormal graphical models. The Annals of Statistics, 40(5), pp.2541-2571.
 
 npn <- function(x, npn_func = "shrinkage", npn_thresh = NULL, verbose = TRUE){
 
@@ -23,55 +27,55 @@ npn <- function(x, npn_func = "shrinkage", npn_thresh = NULL, verbose = TRUE){
   x_row <- rownames(x)
 
   # Shrinkage transformation
-	if(npn_func == "shrinkage"){
-		if(verbose){
+  if(npn_func == "shrinkage"){
+    if(verbose){
 
-		  message("Nonparanormal transformation via shrunken ECDF.\n")
+      message("Nonparanormal transformation via shrunken ECDF.\n")
 
-		}
+    }
 
-		x <- qnorm(apply(x, 2, rank) / (n + 1))
-		x <- x / sd(x[, 1])
+    x <- qnorm(apply(x, 2, rank) / (n + 1))
+    x <- x / sd(x[, 1])
 
-		rm(n, d, verbose)
-   	colnames(x) <- x_col
-		rownames(x) <- x_row
-	}
+    rm(n, d, verbose)
+    colnames(x) <- x_col
+    rownames(x) <- x_row
+  }
 
-	# Truncation transformation
-	if(npn_func == "truncation"){
-		if(verbose){
+  # Truncation transformation
+  if(npn_func == "truncation"){
+    if(verbose){
 
-		  message("Nonparanomral transformation via truncated ECDF.\n")
+      message("Nonparanomral transformation via truncated ECDF.\n")
 
-		}
-	  if(is.null(npn_thresh)){
+    }
+    if(is.null(npn_thresh)){
 
-		  npn_thresh <- 1 / (4*(n^0.25)*sqrt(pi*log(n)))
-		}
+      npn_thresh <- 1 / (4*(n^0.25)*sqrt(pi*log(n)))
+    }
 
-	  x <- qnorm(pmin(pmax(apply(x, 2, rank) / n, npn_thresh), 1 - npn_thresh))
+    x <- qnorm(pmin(pmax(apply(x, 2, rank) / n, npn_thresh), 1 - npn_thresh))
     x <- x / sd(x[, 1])
 
     rm(n, d, npn_thresh, verbose)
 
-   	colnames(x) <- x_col
-		rownames(x) <- x_row
-	}
+    colnames(x) <- x_col
+    rownames(x) <- x_row
+  }
 
-	if(npn_func == "skeptic"){
-		if(verbose){
+  if(npn_func == "skeptic"){
+    if(verbose){
 
-		  message("Nonparanormal transformation via skeptic.\n")
+      message("Nonparanormal transformation via skeptic.\n")
 
-		}
-		x <- 2*sin(pi / 6*cor(x, method="spearman"))
+    }
+    x <- 2*sin(pi / 6*cor(x, method="spearman"))
 
-		rm(n, d, verbose)
+    rm(n, d, verbose)
 
-   	colnames(x) <- x_col
-		rownames(x) <- x_col
-	}
+    colnames(x) <- x_col
+    rownames(x) <- x_col
+  }
 
-	return(x)
+  return(x)
 }

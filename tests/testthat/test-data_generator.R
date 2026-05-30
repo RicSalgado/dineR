@@ -9,7 +9,7 @@ test_that("data_generator produces expected data", {
   p_Y <- p_X
   case <- "sparse"
 
-  data <- data_generator(n = n_X, p = p_X, seed = 123)
+  data <- data_generator(n_X = n_X, p = p_X, seed = 123)
 
   X <- data$X
   Y <- data$Y
