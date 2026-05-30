@@ -1,9 +1,3 @@
----
-editor_options: 
-  markdown: 
-    wrap: 72
----
-
 # dineR
 
 <img src="https://raw.githubusercontent.com/RicSalgado/dineR/master/raw/sticker/dineR.png" width="150" height="150" align="right"/>
