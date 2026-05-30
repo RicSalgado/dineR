@@ -209,7 +209,7 @@ result_seq <- estimation(X, Y, nlambda = 5, cores = 1)
 #> --------------------------------------------------------------------------------
 result_seq$elapse
 #> elapsed 
-#>   0.729 
+#>   0.727 
 
 # \donttest{
 # Parallel - set cores to a value greater than 1
@@ -220,6 +220,6 @@ result_par <- estimation(X, Y, nlambda = 5, cores = 2)
 #> --------------------------------------------------------------------------------
 result_par$elapse
 #> elapsed 
-#>   1.123 
+#>   1.153 
 # }
 ```
